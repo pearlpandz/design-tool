@@ -142,41 +142,45 @@ const ElementRenderer = ({
       if (!node) return;
       const scaleX = node.scaleX();
       const scaleY = node.scaleY();
+
       node.scaleX(1);
       node.scaleY(1);
 
-      // Scale all children (including mask)
       const groupChildren = elements.filter((el) => el.groupId === element.id);
       groupChildren.forEach((child) => {
-        let newProps = { ...child };
-        newProps.x = (child.x - element.x) * scaleX + element.x;
-        newProps.y = (child.y - element.y) * scaleY + element.y;
-        if (child.width) newProps.width = child.width * scaleX;
-        if (child.height) newProps.height = child.height * scaleY;
+        let updated = { ...child };
+
+        updated.x = (child.x - element.x) * scaleX + element.x;
+        updated.y = (child.y - element.y) * scaleY + element.y;
+
+        if (child.width) updated.width = child.width * scaleX;
+        if (child.height) updated.height = child.height * scaleY;
         if (child.radius)
-          newProps.radius = child.radius * Math.max(scaleX, scaleY);
-        // For polygons, scale radius
-        if (child.type === "polygon" && child.radius) {
-          newProps.radius = child.radius * Math.max(scaleX, scaleY);
-        }
-        // For lines, scale points
-        if (child.type === "line" && Array.isArray(child.points)) {
-          newProps.points = child.points.map((val, idx) =>
+          updated.radius = child.radius * Math.max(scaleX, scaleY);
+        if (child.points) {
+          updated.points = child.points.map((val, idx) =>
             idx % 2 === 0
               ? (val - element.x) * scaleX + element.x
               : (val - element.y) * scaleY + element.y
           );
         }
-        onChange(child.id, newProps);
+
+        onChange(child.id, updated);
       });
-      // Force group re-render to update mask for clipping
+
+      // Update group position after scale
       onChange(element.id, {
         x: node.x(),
         y: node.y(),
-        _version: Date.now(), // dummy property to force re-render
+        width: element.width * scaleX,
+        height: element.height * scaleY,
+        _version: Date.now(),
       });
+
       return;
     }
+
+    // default case for single shape
     const node = shapeRef.current;
     if (!node) return;
     const scaleX = node.scaleX();
@@ -191,6 +195,7 @@ const ElementRenderer = ({
       height: Math.max(5, (element.height || node.height()) * scaleY),
     });
   };
+
 
   if (element.type === "group") {
     const groupChildren = elements.filter((el) => el.groupId === element.id);
