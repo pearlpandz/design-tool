@@ -34,6 +34,7 @@ function App() {
         ...baseProps,
         text: "New Text",
         fill: "#333333",
+        strokeWidth: 0, // for text stroke not required
         width: undefined,
         height: undefined,
         fontSize: 20,
@@ -178,10 +179,14 @@ function App() {
   };
 
   const handleContextMenu = (e, elementId) => {
-    e.preventDefault();
+    let event = e;
+    if (e?.evt) {
+      event = e?.evt;
+    }
+    event.preventDefault();
     setContextMenu({
-      x: e.pageX,
-      y: e.pageY,
+      x: event.pageX,
+      y: event.pageY,
       elementId: elementId,
     });
   };
@@ -215,6 +220,14 @@ function App() {
       setSelectedElementsForClipping([element.id]);
     }
     setSelectedElement(element); // Always set the last clicked as the primary selected element
+  };
+
+  const onReorderElements = (startIndex, endIndex) => {
+    const reorderedElements = Array.from(elements);
+    const [removed] = reorderedElements.splice(startIndex, 1);
+    reorderedElements.splice(endIndex, 0, removed);
+
+    setElements(reorderedElements);
   };
 
   const exportCanvas = () => {
@@ -264,6 +277,7 @@ function App() {
             setSelectedElement={handleSelectElement}
             onContextMenu={handleContextMenu}
             selectedElementsForClipping={selectedElementsForClipping}
+            onReorderElements={onReorderElements}
           />
         )}
         <Canvas

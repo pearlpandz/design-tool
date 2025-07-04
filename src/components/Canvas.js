@@ -129,8 +129,14 @@ const VideoElement = ({
         draggable={isSelected} // Make draggable only if selected
         onDragEnd={handleDragEnd}
         onTransformEnd={handleTransformEnd}
-        onClick={onSelect}
-        onTap={onSelect}
+        onClick={(e) => {
+          onSelect(shapeProps, e);
+          e.cancelBubble = true;
+        }}
+        onTap={(e) => {
+          onSelect(shapeProps, e);
+          e.cancelBubble = true;
+        }}
         onContextMenu={(e) => onContextMenu(e, shapeProps.id)}
         ref={imageRef}
       />
@@ -266,8 +272,14 @@ const Shape = ({
 
   const renderShape = () => (
     <KonvaShape
-      onClick={(e) => onSelect(shapeProps, e)}
-      onTap={(e) => onSelect(shapeProps, e)}
+      onClick={(e) => {
+        onSelect(shapeProps, e);
+        e.cancelBubble = true;
+      }}
+      onTap={(e) => {
+        onSelect(shapeProps, e);
+        e.cancelBubble = true;
+      }}
       onContextMenu={(e) => onContextMenu(e, shapeProps.id)}
       ref={shapeRef}
       {...shapeProps}
@@ -365,9 +377,9 @@ const Canvas = ({
   canvasBackgroundColor,
 }) => {
   const handleStageClick = (e) => {
-    const clickedOnEmpty = e.target === e.target.getStage();
-    if (clickedOnEmpty) {
-      setSelectedElement(null, e);
+    // deselect when clicked on empty area
+    if (e.target === e.target.getStage()) {
+      setSelectedElement(null);
     }
   };
 
@@ -377,10 +389,14 @@ const Canvas = ({
     <Stage
       width={600}
       height={600}
-      onClick={(e) => setSelectedElement(null, e)}
-      onTap={(e) => setSelectedElement(null, e)}
+      onClick={handleStageClick}
+      onTap={handleStageClick}
       onContextMenu={(e) => {
-        e.preventDefault();
+        let event = e;
+        if (e?.evt) {
+          event = e?.evt;
+        }
+        event.preventDefault();
         if (e.target !== e.target.getStage()) {
           onContextMenu(e, e.target.id());
         }
