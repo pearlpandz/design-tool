@@ -116,8 +116,6 @@
 
 /* React-colorful overrides for better layout */
 .react-colorful {
-  width: 100% !important;
-  height: auto !important;
   margin-top: 5px;
 }
 
@@ -174,4 +172,36 @@ div:has(>.konvajs-content) {
   cursor: grab;
   font-size: 1.2em;
   color: #888;
+}
+.color-picker-input {
+  position: relative;
+  display: inline-block;
+}
+
+.color-swatch {
+  width: 40px;
+  height: 20px;
+  border-radius: 2px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.color-swatch .color {
+  width: 100%;
+  height: 100%;
+  border-radius: 1px;
+}
+
+.color-picker-popover {
+  position: absolute;
+  z-index: 1001;
+  /* Increased z-index */
+}
+
+.color-picker-cover {
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
 }

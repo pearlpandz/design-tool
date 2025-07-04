@@ -108,12 +108,20 @@ const VideoElement = ({
     if (shapeProps.clipMaskId) {
       const maskElement = getElementById(shapeProps.clipMaskId);
       if (maskElement) {
-        onChange(maskElement.id, {
-          x: maskElement.x + (newX - shapeProps.x), // Adjust mask x by content's x change
-          y: maskElement.y + (newY - shapeProps.y), // Adjust mask y by content's y change
-          width: Math.max(5, maskElement.width * scaleX),
-          height: Math.max(5, maskElement.height * scaleY),
-        });
+        if (maskElement.type === "polygon") {
+          onChange(maskElement.id, {
+            x: maskElement.x + (newX - shapeProps.x),
+            y: maskElement.y + (newY - shapeProps.y),
+            // radius: Math.max(5, maskElement.radius * scaleX),
+          });
+        } else {
+          onChange(maskElement.id, {
+            x: maskElement.x + (newX - shapeProps.x), // Adjust mask x by content's x change
+            y: maskElement.y + (newY - shapeProps.y), // Adjust mask y by content's y change
+            width: Math.max(5, maskElement.width * scaleX),
+            height: Math.max(5, maskElement.height * scaleY),
+          });
+        }
       }
     }
   };
@@ -221,12 +229,20 @@ const Shape = ({
     if (shapeProps.clipMaskId) {
       const maskElement = getElementById(shapeProps.clipMaskId);
       if (maskElement) {
-        onChange(maskElement.id, {
-          x: maskElement.x + (newX - shapeProps.x), // Adjust mask x by content's x change
-          y: maskElement.y + (newY - shapeProps.y), // Adjust mask y by content's y change
-          width: Math.max(5, maskElement.width * scaleX),
-          height: Math.max(5, maskElement.height * scaleY),
-        });
+        if (maskElement.type === "polygon") {
+          onChange(maskElement.id, {
+            x: maskElement.x + (newX - shapeProps.x),
+            y: maskElement.y + (newY - shapeProps.y),
+            // radius: Math.max(5, maskElement.radius * scaleX),
+          });
+        } else {
+          onChange(maskElement.id, {
+            x: maskElement.x + (newX - shapeProps.x), // Adjust mask x by content's x change
+            y: maskElement.y + (newY - shapeProps.y), // Adjust mask y by content's y change
+            width: Math.max(5, maskElement.width * scaleX),
+            height: Math.max(5, maskElement.height * scaleY),
+          });
+        }
       }
     }
   };
@@ -316,17 +332,24 @@ const Shape = ({
           Math.PI * 2
         );
       } else if (maskElement.type === "polygon") {
-        const points = maskElement.points;
-        if (points && points.length >= 2) {
-          ctx.moveTo(maskElement.x + points[0], maskElement.y + points[1]);
-          for (let i = 2; i < points.length; i += 2) {
-            ctx.lineTo(
-              maskElement.x + points[i],
-              maskElement.y + points[i + 1]
-            );
-          }
-          ctx.closePath();
+        const sides = maskElement.sides;
+        const radius = maskElement.radius;
+        const centerX = maskElement.x;
+        const centerY = maskElement.y;
+
+        ctx.moveTo(
+          centerX + radius * Math.cos(0),
+          centerY + radius * Math.sin(0)
+        );
+
+        for (let i = 1; i <= sides; i++) {
+          const angle = (i * 2 * Math.PI) / sides;
+          ctx.lineTo(
+            centerX + radius * Math.cos(angle),
+            centerY + radius * Math.sin(angle)
+          );
         }
+        ctx.closePath();
       }
       ctx.clip();
     };

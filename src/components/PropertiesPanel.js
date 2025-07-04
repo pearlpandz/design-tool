@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { HexColorPicker } from "react-colorful";
 
 const fontFamilies = [
@@ -15,6 +15,33 @@ const fontFamilies = [
   "Comic Sans MS",
 ];
 
+const ColorPickerInput = ({ color, onChange }) => {
+  const [displayColorPicker, setDisplayColorPicker] = useState(false);
+
+  const handleClick = (e) => {
+    e.stopPropagation(); // Stop event propagation
+    setDisplayColorPicker(!displayColorPicker);
+  };
+
+  const handleClose = () => {
+    setDisplayColorPicker(false);
+  };
+
+  return (
+    <div className="color-picker-input">
+      <div className="color-swatch" onClick={handleClick}>
+        <div style={{ backgroundColor: color }} className="color" />
+      </div>
+      {displayColorPicker ? (
+        <div className="color-picker-popover">
+          <div className="color-picker-cover" onClick={handleClose} />
+          <HexColorPicker color={color} onChange={onChange} />
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
 const PropertiesPanel = ({
   selectedElement,
   updateElement,
@@ -30,35 +57,14 @@ const PropertiesPanel = ({
     updateElement(selectedElement.id, { [name]: color });
   };
 
-  const handleCheckboxChange = (e) => {
-    const { name, checked } = e.target;
-    if (name === "bold") {
-      updateElement(selectedElement.id, {
-        fontStyle: checked ? "bold" : "normal",
-      });
-    } else if (name === "italic") {
-      updateElement(selectedElement.id, {
-        fontStyle: checked ? "italic" : "normal",
-      });
-    } else if (name === "underline") {
-      updateElement(selectedElement.id, {
-        textDecoration: checked ? "underline" : "",
-      });
-    } else if (name === "line-through") {
-      updateElement(selectedElement.id, {
-        textDecoration: checked ? "line-through" : "",
-      });
-    }
-  };
-
   return (
     <div className="properties-panel">
-      <h3>Canvas Properties</h3>
+      {/* <h3>Canvas Properties</h3>
       <label>Background Color:</label>
-      <HexColorPicker
+      <ColorPickerInput
         color={canvasBackgroundColor}
         onChange={setCanvasBackgroundColor}
-      />
+      /> */}
 
       {selectedElement && (
         <>
@@ -135,7 +141,11 @@ const PropertiesPanel = ({
                     selectedElement.fontStyle &&
                     selectedElement.fontStyle.includes("bold")
                   }
-                  onChange={handleCheckboxChange}
+                  onChange={(e) =>
+                    updateElement(selectedElement.id, {
+                      fontStyle: e.target.checked ? "bold" : "normal",
+                    })
+                  }
                 />
                 Bold
               </label>
@@ -147,7 +157,11 @@ const PropertiesPanel = ({
                     selectedElement.fontStyle &&
                     selectedElement.fontStyle.includes("italic")
                   }
-                  onChange={handleCheckboxChange}
+                  onChange={(e) =>
+                    updateElement(selectedElement.id, {
+                      fontStyle: e.target.checked ? "italic" : "normal",
+                    })
+                  }
                 />
                 Italic
               </label>
@@ -159,7 +173,11 @@ const PropertiesPanel = ({
                     selectedElement.textDecoration &&
                     selectedElement.textDecoration.includes("underline")
                   }
-                  onChange={handleCheckboxChange}
+                  onChange={(e) =>
+                    updateElement(selectedElement.id, {
+                      textDecoration: e.target.checked ? "underline" : "",
+                    })
+                  }
                 />
                 Underline
               </label>
@@ -171,7 +189,11 @@ const PropertiesPanel = ({
                     selectedElement.textDecoration &&
                     selectedElement.textDecoration.includes("line-through")
                   }
-                  onChange={handleCheckboxChange}
+                  onChange={(e) =>
+                    updateElement(selectedElement.id, {
+                      textDecoration: e.target.checked ? "line-through" : "",
+                    })
+                  }
                 />
                 Line-through
               </label>
@@ -234,7 +256,7 @@ const PropertiesPanel = ({
             selectedElement.type !== "video" && (
               <>
                 <label>Fill Color:</label>
-                <HexColorPicker
+                <ColorPickerInput
                   color={selectedElement.fill}
                   onChange={(color) => handleColorChange(color, "fill")}
                 />
@@ -242,7 +264,7 @@ const PropertiesPanel = ({
             )}
 
           <label>Stroke Color:</label>
-          <HexColorPicker
+          <ColorPickerInput
             color={selectedElement.stroke}
             onChange={(color) => handleColorChange(color, "stroke")}
           />

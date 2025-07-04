@@ -75,7 +75,7 @@ function App() {
     } else if (type === "square") {
       newElement = { ...baseProps, fill: "#aabbcc", width: 100, height: 100 };
     } else if (type === "polygon") {
-      newElement = { ...baseProps, fill: "#aabbcc", sides: 3, radius: 50 };
+      newElement = { ...baseProps, fill: "#aabbcc", sides: 3, radius: 100 };
     } else {
       newElement = { ...baseProps, fill: "#aabbcc", width: 100, height: 100 };
     }
