@@ -1,38 +1,161 @@
 .App {
-  text-align: center;
+  /* display: flex;
+          flex-direction: column; */
+    height: 100vh;
+    position: relative;
+    /* Needed for absolute positioning of context menu */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.main-container {
+  display: flex;
+  height: 100vh;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.toolbar {
+  width: 60px;
+  /* Reverted to smaller width for the vertical toolbar */
+  padding: 10px;
+  background: #f0f0f0;
+  border-right: 1px solid #ccc;
   display: flex;
   flex-direction: column;
+  /* Stack buttons vertically */
+  gap: 10px;
+}
+.toolbar button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5em;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.toolbar button:hover {
+  background: #e0e0e0;
+}
+
+.layers-panel {
+  width: 250px;
+  /* Increased width for the layers panel */
+  padding: 20px;
+  border-right: 1px solid #ccc;
+  background: #fff;
+  overflow-y: auto;
+}
+
+.layers-panel ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.layers-panel li {
+  padding: 5px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+}
+
+.layers-panel li:hover {
+  background: #e0e0e0;
+}
+
+.layers-panel li.selected-layer {
+  background-color: #d0e0ff;
+  /* Highlight color for selected layer */
+  font-weight: bold;
+}
+
+.layers-panel li.multi-selected-layer {
+  background-color: #ffe0b2;
+  border: 1px solid #ff9800;
+}
+
+.layer-icon {
+  margin-right: 8px;
+  font-size: 1.2em;
+}
+
+.properties-panel {
+  width: 250px;
+  /* Width remains 250px for the properties panel */
+  padding: 20px;
+  border-left: 1px solid #ccc;
+  background: #fff;
+  height: 100%;
+  /* Make it take full height of its flex container */
+  overflow-y: auto;
+}
+
+.properties-panel label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.properties-panel input[type="number"],
+.properties-panel input[type="text"],
+.properties-panel textarea {
+  width: calc(100% - 20px);
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.properties-panel textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* React-colorful overrides for better layout */
+.react-colorful {
+  width: 100% !important;
+  height: auto !important;
+  margin-top: 5px;
+}
+
+.react-colorful__saturation {
+  padding-bottom: 50% !important;
+}
+
+.react-colorful__alpha,
+.react-colorful__hue {
+  height: 20px !important;
+}
+
+canvas {
+  background-color: #eee;
+  margin: auto;
+  /* Center the canvas horizontally and vertically */
+}
+
+.context-menu {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  padding: 5px 0;
+}
+.context-menu-item {
+  padding: 8px 15px;
+  cursor: pointer;
+}
+.context-menu-item:hover {
+  background: #f0f0f0;
+}
+
+div:has(>.konvajs-content) {
+  flex: 1;
+  background: #f9f9f9;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  display: flex;
 }
