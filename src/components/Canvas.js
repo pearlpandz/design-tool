@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, forwardRef } from "react";
 import {
   Stage,
   Layer,
@@ -13,240 +13,8 @@ import {
 } from "react-konva";
 import useImage from "use-image";
 
-const VideoElement = ({
-  shapeProps,
-  isSelected,
-  onSelect,
-  onChange,
-  onContextMenu,
-  getElementById,
-}) => {
-  const videoRef = useRef(null);
-  const imageRef = useRef(null);
-  const trRef = useRef(null);
-
-  useEffect(() => {
-    const video = document.createElement("video");
-    video.src = shapeProps.src;
-    video.loop = true;
-    video.muted = true;
-    video.autoplay = true;
-    video.crossOrigin = "anonymous";
-    video.addEventListener("loadedmetadata", () => {
-      imageRef.current.width(video.videoWidth);
-      imageRef.current.height(video.videoHeight);
-      imageRef.current.getLayer().batchDraw();
-    });
-    video.addEventListener("timeupdate", () => {
-      imageRef.current.getLayer().batchDraw();
-    });
-    videoRef.current = video;
-
-    if (shapeProps.isPlaying) {
-      video.play();
-    } else {
-      video.pause();
-    }
-
-    return () => {
-      video.pause();
-      video.removeEventListener("loadedmetadata", () => {});
-      video.removeEventListener("timeupdate", () => {});
-    };
-  }, [shapeProps.src, shapeProps.isPlaying]);
-
-  useEffect(() => {
-    if (isSelected && trRef.current) {
-      trRef.current.nodes([imageRef.current]);
-      trRef.current.getLayer().batchDraw();
-    }
-  }, [isSelected]);
-
-  const handleDragEnd = (e) => {
-    const newX = e.target.x();
-    const newY = e.target.y();
-    const dx = newX - shapeProps.x;
-    const dy = newY - shapeProps.y;
-
-    // Update content element's position
-    onChange(shapeProps.id, { x: newX, y: newY });
-
-    // If clipped, also move the mask element
-    if (shapeProps.clipMaskId) {
-      const maskElement = getElementById(shapeProps.clipMaskId);
-      if (maskElement) {
-        onChange(maskElement.id, {
-          x: maskElement.x + dx,
-          y: maskElement.y + dy,
-        });
-      }
-    }
-  };
-
-  const handleTransformEnd = () => {
-    const node = imageRef.current;
-    const scaleX = node.scaleX();
-    const scaleY = node.scaleY();
-
-    node.scaleX(1);
-    node.scaleY(1);
-
-    const newX = node.x();
-    const newY = node.y();
-    const newWidth = Math.max(5, node.width() * scaleX);
-    const newHeight = Math.max(5, node.height() * scaleY);
-
-    // Update content element's size and position
-    onChange(shapeProps.id, {
-      x: newX,
-      y: newY,
-      width: newWidth,
-      height: newHeight,
-    });
-
-    // If clipped, also transform the mask element
-    if (shapeProps.clipMaskId) {
-      const maskElement = getElementById(shapeProps.clipMaskId);
-      if (maskElement) {
-        if (maskElement.type === "polygon") {
-          onChange(maskElement.id, {
-            x: maskElement.x + (newX - shapeProps.x),
-            y: maskElement.y + (newY - shapeProps.y),
-            // radius: Math.max(5, maskElement.radius * scaleX),
-          });
-        } else {
-          onChange(maskElement.id, {
-            x: maskElement.x + (newX - shapeProps.x), // Adjust mask x by content's x change
-            y: maskElement.y + (newY - shapeProps.y), // Adjust mask y by content's y change
-            width: Math.max(5, maskElement.width * scaleX),
-            height: Math.max(5, maskElement.height * scaleY),
-          });
-        }
-      }
-    }
-  };
-
-  return (
-    <>
-      <KonvaImage
-        image={videoRef.current}
-        x={shapeProps.x}
-        y={shapeProps.y}
-        width={shapeProps.width}
-        height={shapeProps.height}
-        draggable={isSelected} // Make draggable only if selected
-        onDragEnd={handleDragEnd}
-        onTransformEnd={handleTransformEnd}
-        onClick={(e) => {
-          onSelect(shapeProps, e);
-          e.cancelBubble = true;
-        }}
-        onTap={(e) => {
-          onSelect(shapeProps, e);
-          e.cancelBubble = true;
-        }}
-        onContextMenu={(e) => onContextMenu(e, shapeProps.id)}
-        ref={imageRef}
-      />
-      {isSelected && (
-        <Transformer
-          ref={trRef}
-          boundBoxFunc={(oldBox, newBox) => {
-            if (newBox.width < 5 || newBox.height < 5) {
-              return oldBox;
-            }
-            return newBox;
-          }}
-        />
-      )}
-    </>
-  );
-};
-
-const Shape = ({
-  shapeProps,
-  isSelected,
-  onSelect,
-  onChange,
-  onContextMenu,
-  getElementById,
-}) => {
-  const shapeRef = useRef();
-  const trRef = useRef();
-
-  const [image] = useImage(shapeProps.src);
-
-  useEffect(() => {
-    if (isSelected) {
-      trRef.current.nodes([shapeRef.current]);
-      trRef.current.getLayer().batchDraw();
-    }
-  }, [isSelected]);
-
-  const handleDragEnd = (e) => {
-    const newX = e.target.x();
-    const newY = e.target.y();
-    const dx = newX - shapeProps.x;
-    const dy = newY - shapeProps.y;
-
-    // Update content element's position
-    onChange(shapeProps.id, { x: newX, y: newY });
-
-    // If clipped, also move the mask element
-    if (shapeProps.clipMaskId) {
-      const maskElement = getElementById(shapeProps.clipMaskId);
-      if (maskElement) {
-        onChange(maskElement.id, {
-          x: maskElement.x + dx,
-          y: maskElement.y + dy,
-        });
-      }
-    }
-  };
-
-  const handleTransformEnd = () => {
-    const node = shapeRef.current;
-    const scaleX = node.scaleX();
-    const scaleY = node.scaleY();
-
-    node.scaleX(1);
-    node.scaleY(1);
-
-    const newX = node.x();
-    const newY = node.y();
-    const newWidth = Math.max(5, node.width() * scaleX);
-    const newHeight = Math.max(5, node.height() * scaleY);
-
-    // Update content element's size and position
-    onChange(shapeProps.id, {
-      x: newX,
-      y: newY,
-      width: newWidth,
-      height: newHeight,
-    });
-
-    // If clipped, also transform the mask element
-    if (shapeProps.clipMaskId) {
-      const maskElement = getElementById(shapeProps.clipMaskId);
-      if (maskElement) {
-        if (maskElement.type === "polygon") {
-          onChange(maskElement.id, {
-            x: maskElement.x + (newX - shapeProps.x),
-            y: maskElement.y + (newY - shapeProps.y),
-            // radius: Math.max(5, maskElement.radius * scaleX),
-          });
-        } else {
-          onChange(maskElement.id, {
-            x: maskElement.x + (newX - shapeProps.x), // Adjust mask x by content's x change
-            y: maskElement.y + (newY - shapeProps.y), // Adjust mask y by content's y change
-            width: Math.max(5, maskElement.width * scaleX),
-            height: Math.max(5, maskElement.height * scaleY),
-          });
-        }
-      }
-    }
-  };
-
+const GeneralShape = forwardRef((props, ref) => {
+  const { shapeProps, onSelect, onContextMenu } = props;
   let KonvaShape;
   switch (shapeProps.type) {
     case "rect":
@@ -262,32 +30,16 @@ const Shape = ({
     case "text":
       KonvaShape = Text;
       break;
-    case "image":
-    case "gif":
-      KonvaShape = KonvaImage;
-      break;
     case "polygon":
       KonvaShape = RegularPolygon;
       break;
     default:
       return null;
   }
-
-  if (shapeProps.type === "video") {
-    return (
-      <VideoElement
-        shapeProps={shapeProps}
-        isSelected={isSelected}
-        onSelect={onSelect}
-        onChange={onChange}
-        onContextMenu={onContextMenu}
-        getElementById={getElementById}
-      />
-    );
-  }
-
-  const renderShape = () => (
+  return (
     <KonvaShape
+      ref={ref}
+      {...shapeProps}
       onClick={(e) => {
         onSelect(shapeProps, e);
         e.cancelBubble = true;
@@ -297,51 +49,173 @@ const Shape = ({
         e.cancelBubble = true;
       }}
       onContextMenu={(e) => onContextMenu(e, shapeProps.id)}
-      ref={shapeRef}
-      {...shapeProps}
-      image={
-        shapeProps.type === "image" || shapeProps.type === "gif"
-          ? image
-          : undefined
-      }
-      draggable={isSelected} // Make draggable only if selected
-      onDragEnd={handleDragEnd}
-      onTransformEnd={handleTransformEnd}
     />
   );
+});
 
-  if (shapeProps.clipMaskId) {
-    const maskElement = getElementById(shapeProps.clipMaskId);
-    if (!maskElement) return null;
+const ImageBasedShape = forwardRef((props, ref) => {
+  const { shapeProps, onSelect, onContextMenu } = props;
+  const [image] = useImage(shapeProps.src, "anonymous");
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    if (shapeProps.type === "video") {
+      const video = document.createElement("video");
+      video.src = shapeProps.src;
+      video.loop = true;
+      video.muted = true;
+      video.autoplay = true;
+      video.crossOrigin = "anonymous";
+      video.addEventListener("timeupdate", () => {
+        if (ref && ref.current) {
+          ref.current.getLayer().batchDraw();
+        }
+      });
+      videoRef.current = video;
+    }
+  }, [shapeProps.src, shapeProps.type, ref]);
+
+  return (
+    <KonvaImage
+      ref={ref}
+      {...shapeProps}
+      image={shapeProps.type === "video" ? videoRef.current : image}
+      onClick={(e) => {
+        onSelect(shapeProps, e);
+        e.cancelBubble = true;
+      }}
+      onTap={(e) => {
+        onSelect(shapeProps, e);
+        e.cancelBubble = true;
+      }}
+      onContextMenu={(e) => onContextMenu(e, shapeProps.id)}
+    />
+  );
+});
+
+const Shape = forwardRef((props, ref) => {
+  const { shapeProps } = props;
+  if (
+    shapeProps.type === "image" ||
+    shapeProps.type === "gif" ||
+    shapeProps.type === "video"
+  ) {
+    return <ImageBasedShape ref={ref} {...props} />;
+  }
+  return <GeneralShape ref={ref} {...props} />;
+});
+
+const ElementRenderer = ({
+  element,
+  elements,
+  isSelected,
+  onSelect,
+  onChange,
+  onContextMenu,
+}) => {
+  const shapeRef = useRef();
+  const trRef = useRef();
+  const maskRef = useRef();
+
+  useEffect(() => {
+    if (
+      element.type === "group" &&
+      isSelected &&
+      trRef.current &&
+      maskRef.current
+    ) {
+      trRef.current.nodes([maskRef.current]);
+      trRef.current.getLayer().batchDraw();
+    } else if (isSelected && trRef.current && shapeRef.current) {
+      trRef.current.nodes([shapeRef.current]);
+      trRef.current.getLayer().batchDraw();
+    }
+  }, [isSelected, element.type]);
+
+  const handleDragEnd = (e) => {
+    onChange(element.id, { x: e.target.x(), y: e.target.y() });
+  };
+
+  const handleTransformEnd = () => {
+    if (element.type === "group") {
+      const node = shapeRef.current;
+      if (!node) return;
+      const scaleX = node.scaleX();
+      const scaleY = node.scaleY();
+      node.scaleX(1);
+      node.scaleY(1);
+
+      // Scale all children (including mask)
+      const groupChildren = elements.filter((el) => el.groupId === element.id);
+      groupChildren.forEach((child) => {
+        let newProps = { ...child };
+        newProps.x = (child.x - element.x) * scaleX + element.x;
+        newProps.y = (child.y - element.y) * scaleY + element.y;
+        if (child.width) newProps.width = child.width * scaleX;
+        if (child.height) newProps.height = child.height * scaleY;
+        if (child.radius)
+          newProps.radius = child.radius * Math.max(scaleX, scaleY);
+        // For polygons, scale radius
+        if (child.type === "polygon" && child.radius) {
+          newProps.radius = child.radius * Math.max(scaleX, scaleY);
+        }
+        // For lines, scale points
+        if (child.type === "line" && Array.isArray(child.points)) {
+          newProps.points = child.points.map((val, idx) =>
+            idx % 2 === 0
+              ? (val - element.x) * scaleX + element.x
+              : (val - element.y) * scaleY + element.y
+          );
+        }
+        onChange(child.id, newProps);
+      });
+      // Force group re-render to update mask for clipping
+      onChange(element.id, {
+        x: node.x(),
+        y: node.y(),
+        _version: Date.now(), // dummy property to force re-render
+      });
+      return;
+    }
+    const node = shapeRef.current;
+    if (!node) return;
+    const scaleX = node.scaleX();
+    const scaleY = node.scaleY();
+    node.scaleX(1);
+    node.scaleY(1);
+
+    onChange(element.id, {
+      x: node.x(),
+      y: node.y(),
+      width: Math.max(5, (element.width || node.width()) * scaleX),
+      height: Math.max(5, (element.height || node.height()) * scaleY),
+    });
+  };
+
+  if (element.type === "group") {
+    const groupChildren = elements.filter((el) => el.groupId === element.id);
+    // Always get the latest mask from elements (not from groupChildren)
+    const mask = elements.find(
+      (el) => el.groupId === element.id && el.isClippingMask
+    );
+
+    if (!mask) return null;
 
     const clipFunc = (ctx) => {
       ctx.beginPath();
-      if (maskElement.type === "rect" || maskElement.type === "square") {
-        ctx.rect(
-          maskElement.x,
-          maskElement.y,
-          maskElement.width,
-          maskElement.height
-        );
-      } else if (maskElement.type === "circle") {
-        ctx.arc(
-          maskElement.x,
-          maskElement.y,
-          maskElement.radius || maskElement.width / 2,
-          0,
-          Math.PI * 2
-        );
-      } else if (maskElement.type === "polygon") {
-        const sides = maskElement.sides;
-        const radius = maskElement.radius;
-        const centerX = maskElement.x;
-        const centerY = maskElement.y;
-
+      if (mask.type === "rect" || mask.type === "square") {
+        ctx.rect(mask.x, mask.y, mask.width, mask.height);
+      } else if (mask.type === "circle") {
+        ctx.arc(mask.x, mask.y, mask.radius, 0, Math.PI * 2);
+      } else if (mask.type === "polygon") {
+        const sides = mask.sides;
+        const radius = mask.radius;
+        const centerX = mask.x;
+        const centerY = mask.y;
         ctx.moveTo(
           centerX + radius * Math.cos(0),
           centerY + radius * Math.sin(0)
         );
-
         for (let i = 1; i <= sides; i++) {
           const angle = (i * 2 * Math.PI) / sides;
           ctx.lineTo(
@@ -355,33 +229,66 @@ const Shape = ({
     };
 
     return (
-      <Group clipFunc={clipFunc}>
-        {renderShape()}
+      <>
+        <Group
+          ref={shapeRef}
+          {...element}
+          draggable={isSelected}
+          onDragEnd={handleDragEnd}
+          onTransformEnd={handleTransformEnd}
+          onClick={(e) => {
+            onSelect(element, e);
+            e.cancelBubble = true;
+          }}
+          onTap={(e) => {
+            onSelect(element, e);
+            e.cancelBubble = true;
+          }}
+          onContextMenu={(e) => onContextMenu(e, element.id)}
+          clipFunc={clipFunc}
+        >
+          {groupChildren.map((child) => (
+            <Shape
+              key={child.id}
+              ref={child.isClippingMask ? maskRef : undefined}
+              shapeProps={child}
+              onSelect={() => onSelect(element)}
+              onContextMenu={onContextMenu}
+            />
+          ))}
+        </Group>
         {isSelected && (
           <Transformer
             ref={trRef}
             boundBoxFunc={(oldBox, newBox) => {
-              if (newBox.width < 5 || newBox.height < 5) {
-                return oldBox;
-              }
+              if (newBox.width < 5 || newBox.height < 5) return oldBox;
               return newBox;
             }}
+            nodes={maskRef.current ? [maskRef.current] : []}
           />
         )}
-      </Group>
+      </>
     );
   }
 
   return (
     <>
-      {renderShape()}
+      <Shape
+        ref={shapeRef}
+        shapeProps={{
+          ...element,
+          draggable: isSelected,
+          onDragEnd: handleDragEnd,
+          onTransformEnd: handleTransformEnd,
+        }}
+        onSelect={onSelect}
+        onContextMenu={onContextMenu}
+      />
       {isSelected && (
         <Transformer
           ref={trRef}
           boundBoxFunc={(oldBox, newBox) => {
-            if (newBox.width < 5 || newBox.height < 5) {
-              return oldBox;
-            }
+            if (newBox.width < 5 || newBox.height < 5) return oldBox;
             return newBox;
           }}
         />
@@ -400,13 +307,12 @@ const Canvas = ({
   canvasBackgroundColor,
 }) => {
   const handleStageClick = (e) => {
-    // deselect when clicked on empty area
     if (e.target === e.target.getStage()) {
       setSelectedElement(null);
     }
   };
 
-  const getElementById = (id) => elements.find((el) => el.id === id);
+  const topLevelElements = elements.filter((el) => !el.groupId);
 
   return (
     <Stage
@@ -421,7 +327,7 @@ const Canvas = ({
         }
         event.preventDefault();
         if (e.target !== e.target.getStage()) {
-          onContextMenu(e, e.target.id());
+          onContextMenu(e, e.target.attrs.id);
         }
       }}
       ref={stageRef}
@@ -434,23 +340,17 @@ const Canvas = ({
           height={600}
           fill={canvasBackgroundColor}
         />
-        {elements.map((element) => {
-          if (element.isClippingMask) return null;
-
-          return (
-            <Shape
-              key={element.id}
-              shapeProps={element}
-              isSelected={
-                element.id === (selectedElement && selectedElement.id)
-              }
-              onSelect={setSelectedElement}
-              onChange={updateElement}
-              onContextMenu={onContextMenu}
-              getElementById={getElementById}
-            />
-          );
-        })}
+        {topLevelElements.map((element) => (
+          <ElementRenderer
+            key={element.id}
+            element={element}
+            elements={elements}
+            isSelected={selectedElement && selectedElement.id === element.id}
+            onSelect={setSelectedElement}
+            onChange={updateElement}
+            onContextMenu={onContextMenu}
+          />
+        ))}
       </Layer>
     </Stage>
   );

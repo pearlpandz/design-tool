@@ -132,49 +132,74 @@ function App() {
   };
 
   const applyClippingMask = () => {
-    if (selectedElementsForClipping.length === 2) {
-      let maskId, contentId;
-      const firstElementType = elements.find(
-        (element) => element.id === selectedElementsForClipping[0]
-      )?.type;
-      if (firstElementType === "image") {
-        maskId = selectedElementsForClipping[1]; // selected shape is mask
-        contentId = selectedElementsForClipping[0]; // selected image/video/gif is content
-      } else {
-        maskId = selectedElementsForClipping[0]; // selected shape is mask
-        contentId = selectedElementsForClipping[1]; // selected image/video/gif is content
-      }
+    if (selectedElementsForClipping.length !== 2) return;
 
-      setElements(
-        elements.map((el) => {
-          if (el.id === contentId) {
-            return { ...el, clipMaskId: maskId };
-          } else if (el.id === maskId) {
-            return { ...el, isClippingMask: true }; // Mark mask element
-          }
-          return el;
-        })
-      );
-      setSelectedElementsForClipping([]); // Clear selection after applying
-      setContextMenu(null);
-    }
+    const [id1, id2] = selectedElementsForClipping;
+    const el1 = elements.find((e) => e.id === id1);
+    const el2 = elements.find((e) => e.id === id2);
+
+    const shape =
+      el1.type !== "image" && el1.type !== "gif" && el1.type !== "video"
+        ? el1
+        : el2;
+    const content = el1 === shape ? el2 : el1;
+
+    if (!shape || !content) return;
+
+    const groupId = uuidv4();
+    const newGroup = {
+      id: groupId,
+      type: "group",
+      x: shape.x,
+      y: shape.y,
+      width: shape.width,
+      height: shape.height,
+    };
+
+    const updatedElements = elements.map((el) => {
+      if (el.id === shape.id) {
+        return {
+          ...el,
+          groupId: groupId,
+          isClippingMask: true,
+          // x: el.x - newGroup.x,
+          // y: el.y - newGroup.y,
+        };
+      }
+      if (el.id === content.id) {
+        return {
+          ...el,
+          groupId: groupId,
+          // x: el.x - newGroup.x,
+          // y: el.y - newGroup.y,
+        };
+      }
+      return el;
+    });
+
+    setElements([...updatedElements, newGroup]);
+    setSelectedElementsForClipping([]);
+    setContextMenu(null);
   };
 
-  const releaseClippingMask = (contentId) => {
-    setElements(
-      elements.map((el) => {
-        if (el.id === contentId) {
-          const maskElement = elements.find((m) => m.id === el.clipMaskId);
-          if (maskElement) {
-            return { ...el, clipMaskId: undefined };
-          }
-        }
-        if (el.isClippingMask) {
-          return { ...el, isClippingMask: false };
+  const releaseClippingMask = (elementId) => {
+    const element = elements.find((el) => el.id === elementId);
+    if (!element || !element.groupId) return;
+
+    const groupId = element.groupId;
+    const group = elements.find((el) => el.id === groupId);
+
+    const updatedElements = elements
+      .map((el) => {
+        if (el.groupId === groupId) {
+          const { groupId, isClippingMask, ...rest } = el;
+          return { ...rest, x: el.x + group.x, y: el.y + group.y };
         }
         return el;
       })
-    );
+      .filter((el) => el.id !== groupId);
+
+    setElements(updatedElements);
     setContextMenu(null);
   };
 
@@ -309,8 +334,7 @@ function App() {
           }
           canApplyClippingMask={selectedElementsForClipping.length === 2}
           isElementClipped={
-            elements.find((el) => el.id === contextMenu.elementId)
-              ?.clipMaskId !== undefined
+            !!elements.find((el) => el.id === contextMenu.elementId)?.groupId
           }
           onClose={() => setContextMenu(null)}
         />
