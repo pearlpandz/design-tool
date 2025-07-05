@@ -213,7 +213,7 @@ const ElementRenderer = ({
         ctx.arc(mask.x, mask.y, mask.radius, 0, Math.PI * 2);
       } else if (mask.type === "polygon") {
         const sides = mask.sides;
-        const radius = mask.radius;
+        const radius = mask.radius ?? 100;
         const centerX = mask.x;
         const centerY = mask.y;
         ctx.moveTo(

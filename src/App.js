@@ -75,7 +75,14 @@ function App() {
     } else if (type === "square") {
       newElement = { ...baseProps, fill: "#aabbcc", width: 100, height: 100 };
     } else if (type === "polygon") {
-      newElement = { ...baseProps, fill: "#aabbcc", sides: 6, radius: 100 };
+      newElement = {
+        ...baseProps,
+        fill: "#aabbcc",
+        sides: 6,
+        radius: 100,
+        width: 100,
+        height: 100,
+      };
     } else if (type === "circle") {
       newElement = { ...baseProps, fill: "#aabbcc", radius: 50, width: 100, height: 100 };
     } else {
