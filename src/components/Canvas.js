@@ -196,7 +196,6 @@ const ElementRenderer = ({
     });
   };
 
-
   if (element.type === "group") {
     const groupChildren = elements.filter((el) => el.groupId === element.id);
     // Always get the latest mask from elements (not from groupChildren)
@@ -356,7 +355,7 @@ const Canvas = ({
             onSelect={setSelectedElement}
             onChange={updateElement}
             onContextMenu={onContextMenu}
-            />
+          />
         ))}
       </Layer>
     </Stage>

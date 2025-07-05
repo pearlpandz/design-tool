@@ -75,7 +75,9 @@ function App() {
     } else if (type === "square") {
       newElement = { ...baseProps, fill: "#aabbcc", width: 100, height: 100 };
     } else if (type === "polygon") {
-      newElement = { ...baseProps, fill: "#aabbcc", sides: 3, radius: 100 };
+      newElement = { ...baseProps, fill: "#aabbcc", sides: 6, radius: 100 };
+    } else if (type === "circle") {
+      newElement = { ...baseProps, fill: "#aabbcc", radius: 50, width: 100, height: 100 };
     } else {
       newElement = { ...baseProps, fill: "#aabbcc", width: 100, height: 100 };
     }
@@ -162,16 +164,18 @@ function App() {
           ...el,
           groupId: groupId,
           isClippingMask: true,
-          // x: el.x - newGroup.x,
-          // y: el.y - newGroup.y,
+          // x and y adjustments for group
+          x: el.x - newGroup.x,
+          y: el.y - newGroup.y,
         };
       }
       if (el.id === content.id) {
         return {
           ...el,
           groupId: groupId,
-          // x: el.x - newGroup.x,
-          // y: el.y - newGroup.y,
+          // x and y adjustments for group
+          x: el.x - newGroup.x,
+          y: el.y - newGroup.y,
         };
       }
       return el;
