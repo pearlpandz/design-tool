@@ -303,6 +303,7 @@ function App() {
             onContextMenu={handleContextMenu}
             selectedElementsForClipping={selectedElementsForClipping}
             onReorderElements={onReorderElements}
+            updateElement={updateElement}
           />
         )}
         <Canvas

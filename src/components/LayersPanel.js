@@ -1,5 +1,7 @@
 import React from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { FaCaretDown, FaCaretRight } from "react-icons/fa";
+import { MdDragHandle } from "react-icons/md";
 
 const getLayerIcon = (type) => {
   switch (type) {
@@ -28,7 +30,7 @@ const getLayerIcon = (type) => {
   }
 };
 
-const Layer = ({ element, index, children, ...props }) => {
+const Layer = ({ element, index, children, updateElement, ...props }) => {
   return (
     <Draggable key={element.id} draggableId={element.id} index={index}>
       {(provided, snapshot) => (
@@ -38,31 +40,54 @@ const Layer = ({ element, index, children, ...props }) => {
             onContextMenu={(e) => props.onContextMenu(e, element.id)}
             className={`
               layer-item
-              ${props.selectedElement?.id === element.id ? "selected-layer" : ""}
-              ${props.selectedElementsForClipping.includes(element.id)
-                ? "multi-selected-layer"
-                : ""
+              ${
+                props.selectedElement?.id === element.id ? "selected-layer" : ""
+              }
+              ${
+                props.selectedElementsForClipping.includes(element.id)
+                  ? "multi-selected-layer"
+                  : ""
               }
               ${snapshot.isDragging ? "dragging" : ""}
             `}
           >
             <span className="drag-handle" {...provided.dragHandleProps}>
-              ☰
+              <MdDragHandle />
             </span>
+            {element.type === "group" && (
+              <span
+                className="collapse-toggle"
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent selecting the group when toggling
+                  updateElement(element.id, {
+                    isCollapsed: !element.isCollapsed,
+                  });
+                }}
+              >
+                {element.isCollapsed ? <FaCaretRight /> : <FaCaretDown />}
+              </span>
+            )}
             <span className="layer-icon">{getLayerIcon(element.type)}</span>
             {element.type} - {element.id.substring(0, 4)}
             {element.isClippingMask && (
               <span className="clip-indicator"> (Mask)</span>
             )}
           </li>
-          {children && <ul className="nested-layers">{children}</ul>}
+          {children && !element.isCollapsed && (
+            <ul className="nested-layers">{children}</ul>
+          )}
         </div>
       )}
     </Draggable>
   );
 };
 
-const LayersPanel = ({ elements, onReorderElements, ...props }) => {
+const LayersPanel = ({
+  elements,
+  onReorderElements,
+  updateElement,
+  ...props
+}) => {
   const onDragEnd = (result) => {
     if (!result.destination) {
       return;
@@ -74,12 +99,19 @@ const LayersPanel = ({ elements, onReorderElements, ...props }) => {
     if (element.type === "group") {
       const children = elements.filter((e) => e.groupId === element.id);
       return (
-        <Layer key={element.id} element={element} index={index} {...props}>
+        <Layer
+          key={element.id}
+          element={element}
+          index={index}
+          updateElement={updateElement}
+          {...props}
+        >
           {children.map((child, childIndex) => (
             <Layer
               key={child.id}
               element={child}
               index={childIndex}
+              updateElement={updateElement}
               {...props}
             />
           ))}

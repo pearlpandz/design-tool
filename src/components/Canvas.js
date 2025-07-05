@@ -356,7 +356,7 @@ const Canvas = ({
             onSelect={setSelectedElement}
             onChange={updateElement}
             onContextMenu={onContextMenu}
-          />
+            />
         ))}
       </Layer>
     </Stage>
