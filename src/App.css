@@ -40,7 +40,7 @@
 }
 
 .layers-panel {
-  width: 250px;
+  width: 300px;
   /* Increased width for the layers panel */
   padding: 20px;
   border-right: 1px solid #ccc;
@@ -83,7 +83,7 @@
 }
 
 .properties-panel {
-  width: 250px;
+  width: 300px;
   /* Width remains 250px for the properties panel */
   padding: 20px;
   border-left: 1px solid #ccc;

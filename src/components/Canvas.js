@@ -52,9 +52,10 @@ const GeneralShape = forwardRef((props, ref) => {
       {...(shapeProps.type === "text"
         ? {
             fill: shapeProps.color,
-            fontStyle: `${shapeProps.fontStyle} ${shapeProps.fontWeight}`.trim(),
+            fontStyle:
+              `${shapeProps.fontStyle} ${shapeProps.fontWeight}`.trim(),
             align: shapeProps.textAlign,
-            textDecoration: shapeProps.textDecoration.join(' '),
+            textDecoration: shapeProps.textDecoration,
             lineHeight: shapeProps.lineHeight,
             padding: shapeProps.padding,
           }
