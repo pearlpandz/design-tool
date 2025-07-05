@@ -1,4 +1,4 @@
-import { FaRegSquare, FaRegCircle, FaRegFolder } from "react-icons/fa";
+import { FaRegSquare, FaRegCircle, FaRegFolder, FaRegStar } from "react-icons/fa";
 import { MdFileDownload } from "react-icons/md";
 import { LuRectangleHorizontal } from "react-icons/lu";
 import { FiMinus } from "react-icons/fi";
@@ -35,6 +35,9 @@ const Toolbar = ({
       </button>
       <button onClick={() => addElement("polygon")} title="Add Polygon">
         <LiaDrawPolygonSolid />
+      </button>
+      <button onClick={() => addElement("star")} title="Add Star">
+        <FaRegStar />
       </button>
       <button onClick={() => addElement("text")} title="Add Text">
         <IoTextOutline />

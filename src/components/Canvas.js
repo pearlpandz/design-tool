@@ -10,6 +10,7 @@ import {
   Image as KonvaImage,
   RegularPolygon,
   Group,
+  Star,
 } from "react-konva";
 import useImage from "use-image";
 
@@ -41,6 +42,9 @@ const GeneralShape = forwardRef((props, ref) => {
       break;
     case "polygon":
       KonvaShape = RegularPolygon;
+      break;
+    case "star":
+      KonvaShape = Star;
       break;
     default:
       return null;
@@ -245,6 +249,26 @@ const ElementRenderer = ({
           ctx.lineTo(
             centerX + radius * Math.cos(angle),
             centerY + radius * Math.sin(angle)
+          );
+        }
+        ctx.closePath();
+      } else if (mask.type === "star") {
+        const points = mask.numPoints;
+        const outerRadius = mask.outerRadius;
+        const innerRadius = mask.innerRadius;
+        const centerX = mask.x;
+        const centerY = mask.y;
+        ctx.moveTo(centerX, centerY - outerRadius);
+        for (let i = 0; i < points; i++) {
+          const outerAngle = (i * 2 * Math.PI) / points - Math.PI / 2;
+          const innerAngle = outerAngle + Math.PI / points;
+          ctx.lineTo(
+            centerX + outerRadius * Math.cos(outerAngle),
+            centerY + outerRadius * Math.sin(outerAngle)
+          );
+          ctx.lineTo(
+            centerX + innerRadius * Math.cos(innerAngle),
+            centerY + innerRadius * Math.sin(innerAngle)
           );
         }
         ctx.closePath();

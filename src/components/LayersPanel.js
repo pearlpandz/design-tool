@@ -25,6 +25,8 @@ const getLayerIcon = (type) => {
       return "🔺";
     case "group":
       return "📁";
+    case "star":
+      return "⭐";
     default:
       return "❓";
   }

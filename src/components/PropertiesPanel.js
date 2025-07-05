@@ -567,6 +567,42 @@ const PropertiesPanel = ({
             />
           </div>
 
+          {selectedElement.type === "star" && (
+            <>
+              <div style={sectionTitleStyle}>STAR PROPERTIES</div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>SPIKES</span>
+                <input
+                  type="number"
+                  name="numPoints"
+                  value={selectedElement.numPoints}
+                  onChange={handleChange}
+                  style={inputStyle}
+                />
+              </div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>INNER RADIUS</span>
+                <input
+                  type="number"
+                  name="innerRadius"
+                  value={selectedElement.innerRadius}
+                  onChange={handleChange}
+                  style={inputStyle}
+                />
+              </div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>OUTER RADIUS</span>
+                <input
+                  type="number"
+                  name="outerRadius"
+                  value={selectedElement.outerRadius}
+                  onChange={handleChange}
+                  style={inputStyle}
+                />
+              </div>
+            </>
+          )}
+
           {/* ...existing code for text options, image/video/polygon, etc., can be grouped or hidden as needed... */}
         </>
       )}

@@ -112,6 +112,16 @@ function App() {
         width: 100,
         height: 100,
       };
+    } else if (type === "star") {
+      newElement = {
+        ...baseProps,
+        fill: "#aabbcc",
+        numPoints: 5,
+        outerRadius: 50,
+        innerRadius: 15,
+        width: 100,
+        height: 100,
+      };
     } else if (type === "circle") {
       newElement = {
         ...baseProps,
