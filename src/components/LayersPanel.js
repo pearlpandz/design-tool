@@ -10,6 +10,7 @@ const getLayerIcon = (type) => {
     case "square":
       return "🟦";
     case "circle":
+    case "ellipse":
       return "🔵";
     case "line":
       return "➖";

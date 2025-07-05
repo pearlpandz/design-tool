@@ -1,10 +1,10 @@
 
 import React from "react";
-import { RegularPolygon } from "react-konva";
+import { Star as KonvaStar } from "react-konva";
 
 const Star = (props) => {
   return (
-    <RegularPolygon
+    <KonvaStar
       {...props}
       sides={props.numPoints}
       innerRadius={props.innerRadius}

@@ -140,6 +140,15 @@ function App() {
         width: 100,
         height: 100,
       };
+    } else if (type === "ellipse") {
+      newElement = {
+        ...baseProps,
+        fill: "#aabbcc",
+        radiusX: 50,
+        radiusY: 50,
+        width: 100,
+        height: 100,
+      };
     } else {
       newElement = { ...baseProps, fill: "#aabbcc", width: 100, height: 100 };
     }

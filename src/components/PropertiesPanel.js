@@ -678,6 +678,32 @@ const PropertiesPanel = ({
             </>
           )}
 
+          {selectedElement.type === "ellipse" && (
+            <>
+              <div style={sectionTitleStyle}>ELLIPSE PROPERTIES</div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>RADIUS X</span>
+                <input
+                  type="number"
+                  name="radiusX"
+                  value={selectedElement.radiusX}
+                  onChange={handleChange}
+                  style={inputStyle}
+                />
+              </div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>RADIUS Y</span>
+                <input
+                  type="number"
+                  name="radiusY"
+                  value={selectedElement.radiusY}
+                  onChange={handleChange}
+                  style={inputStyle}
+                />
+              </div>
+            </>
+          )}
+
           {/* ...existing code for text options, image/video/polygon, etc., can be grouped or hidden as needed... */}
         </>
       )}

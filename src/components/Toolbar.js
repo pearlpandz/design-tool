@@ -11,7 +11,7 @@ import {
 } from "react-icons/io5";
 import { GiFilmStrip } from "react-icons/gi";
 import { LiaDrawPolygonSolid } from "react-icons/lia";
-import { TbCircleDashed } from "react-icons/tb";
+import { TbCircleDashed, TbOvalVertical } from "react-icons/tb";
 
 const Toolbar = ({
   addElement,
@@ -42,6 +42,9 @@ const Toolbar = ({
       </button>
       <button onClick={() => addElement("arc")} title="Add Arc">
         <TbCircleDashed />
+      </button>
+      <button onClick={() => addElement("ellipse")} title="Add Ellipse">
+        <TbOvalVertical />
       </button>
       <button onClick={() => addElement("text")} title="Add Text">
         <IoTextOutline />

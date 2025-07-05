@@ -14,6 +14,7 @@ import {
 import useImage from "use-image";
 import Star from "./Star";
 import Arc from "./Arc";
+import Ellipse from "./Ellipse";
 
 const GeneralShape = forwardRef((props, ref) => {
   const { shapeProps, onSelect, onContextMenu } = props;
@@ -49,6 +50,9 @@ const GeneralShape = forwardRef((props, ref) => {
       break;
     case "arc":
       KonvaShape = Arc;
+      break;
+    case "ellipse":
+      KonvaShape = Ellipse;
       break;
     default:
       return null;
@@ -185,6 +189,8 @@ const ElementRenderer = ({
         if (child.height) updated.height = child.height * scaleY;
         if (child.radius)
           updated.radius = child.radius * Math.max(scaleX, scaleY);
+        if (child.radiusX) updated.radiusX = child.radiusX * scaleX;
+        if (child.radiusY) updated.radiusY = child.radiusY * scaleY;
         if (child.points) {
           updated.points = child.points.map((val, idx) =>
             idx % 2 === 0
@@ -216,12 +222,19 @@ const ElementRenderer = ({
     node.scaleX(1);
     node.scaleY(1);
 
-    onChange(element.id, {
+    const updatedProps = {
       x: node.x(),
       y: node.y(),
       width: Math.max(5, (element.width || node.width()) * scaleX),
       height: Math.max(5, (element.height || node.height()) * scaleY),
-    });
+    };
+
+    if (element.type === "ellipse") {
+      updatedProps.radiusX = updatedProps.width / 2;
+      updatedProps.radiusY = updatedProps.height / 2;
+    }
+
+    onChange(element.id, updatedProps);
   };
 
   if (element.type === "group") {
@@ -300,6 +313,13 @@ const ElementRenderer = ({
           true
         );
         ctx.closePath();
+      } else if (mask.type === "ellipse") {
+        const centerX = mask.x;
+        const centerY = mask.y;
+        const radiusX = mask.radiusX;
+        const radiusY = mask.radiusY;
+
+        ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, Math.PI * 2);
       }
       ctx.clip();
     };
