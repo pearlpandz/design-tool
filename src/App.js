@@ -122,6 +122,16 @@ function App() {
         width: 100,
         height: 100,
       };
+    } else if (type === "arc") {
+      newElement = {
+        ...baseProps,
+        fill: "#aabbcc",
+        innerRadius: 30,
+        outerRadius: 50,
+        angle: 60,
+        width: 100,
+        height: 100,
+      };
     } else if (type === "circle") {
       newElement = {
         ...baseProps,

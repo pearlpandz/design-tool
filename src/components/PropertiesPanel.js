@@ -603,6 +603,81 @@ const PropertiesPanel = ({
             </>
           )}
 
+          {selectedElement.type === "arc" && (
+            <>
+              <div style={sectionTitleStyle}>ARC PROPERTIES</div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>ANGLE</span>
+                <input
+                  type="range"
+                  name="angle"
+                  min="0"
+                  max="360"
+                  step="1"
+                  value={selectedElement.angle}
+                  onChange={handleChange}
+                  style={sliderStyle}
+                />
+                <span
+                  style={{
+                    fontSize: "13px",
+                    minWidth: "28px",
+                    textAlign: "right",
+                    flexShrink: 0,
+                  }}
+                >
+                  {selectedElement.angle}
+                </span>
+              </div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>INNER RADIUS</span>
+                <input
+                  type="range"
+                  name="innerRadius"
+                  min="0"
+                  max="200"
+                  step="1"
+                  value={selectedElement.innerRadius}
+                  onChange={handleChange}
+                  style={sliderStyle}
+                />
+                <span
+                  style={{
+                    fontSize: "13px",
+                    minWidth: "28px",
+                    textAlign: "right",
+                    flexShrink: 0,
+                  }}
+                >
+                  {selectedElement.innerRadius}
+                </span>
+              </div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>OUTER RADIUS</span>
+                <input
+                  type="range"
+                  name="outerRadius"
+                  min="0"
+                  max="200"
+                  step="1"
+                  value={selectedElement.outerRadius}
+                  onChange={handleChange}
+                  style={sliderStyle}
+                />
+                <span
+                  style={{
+                    fontSize: "13px",
+                    minWidth: "28px",
+                    textAlign: "right",
+                    flexShrink: 0,
+                  }}
+                >
+                  {selectedElement.outerRadius}
+                </span>
+              </div>
+            </>
+          )}
+
           {/* ...existing code for text options, image/video/polygon, etc., can be grouped or hidden as needed... */}
         </>
       )}

@@ -10,9 +10,10 @@ import {
   Image as KonvaImage,
   RegularPolygon,
   Group,
-  Star,
 } from "react-konva";
 import useImage from "use-image";
+import Star from "./Star";
+import Arc from "./Arc";
 
 const GeneralShape = forwardRef((props, ref) => {
   const { shapeProps, onSelect, onContextMenu } = props;
@@ -45,6 +46,9 @@ const GeneralShape = forwardRef((props, ref) => {
       break;
     case "star":
       KonvaShape = Star;
+      break;
+    case "arc":
+      KonvaShape = Arc;
       break;
     default:
       return null;
@@ -271,6 +275,30 @@ const ElementRenderer = ({
             centerY + innerRadius * Math.sin(innerAngle)
           );
         }
+        ctx.closePath();
+      } else if (mask.type === "arc") {
+        const centerX = mask.x;
+        const centerY = mask.y;
+        const innerRadius = mask.innerRadius;
+        const outerRadius = mask.outerRadius;
+        const angle = mask.angle;
+
+        ctx.arc(
+          centerX,
+          centerY,
+          outerRadius,
+          0,
+          (angle * Math.PI) / 180,
+          false
+        );
+        ctx.arc(
+          centerX,
+          centerY,
+          innerRadius,
+          (angle * Math.PI) / 180,
+          0,
+          true
+        );
         ctx.closePath();
       }
       ctx.clip();
