@@ -344,6 +344,8 @@ const Canvas = ({
           width={600}
           height={600}
           fill={canvasBackgroundColor}
+          onClick={() => setSelectedElement(null)}
+          onTap={() => setSelectedElement(null)}
         />
         {topLevelElements.map((element) => (
           <ElementRenderer

@@ -14,6 +14,8 @@ import {
   FaVideo,
 } from "react-icons/fa";
 import { MdGif } from "react-icons/md";
+import { LuRectangleHorizontal } from "react-icons/lu";
+
 const Toolbar = ({
   addElement,
   exportCanvas,
@@ -24,7 +26,7 @@ const Toolbar = ({
   return (
     <div className="toolbar">
       <button onClick={() => addElement("rect")} title="Add Rectangle">
-        <FaSquare />
+        <LuRectangleHorizontal />
       </button>
       <button onClick={() => addElement("square")} title="Add Square">
         <FaSquareFull />
