@@ -34,7 +34,15 @@ const Layer = ({ element, index, children, updateElement, ...props }) => {
   return (
     <Draggable key={element.id} draggableId={element.id} index={index}>
       {(provided, snapshot) => (
-        <div ref={provided.innerRef} {...provided.draggableProps}>
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          style={{
+            ...provided.draggableProps.style,
+            // Add z-index to the dragging item to ensure it's on top
+            zIndex: snapshot.isDragging ? 9999 : "auto",
+          }}
+        >
           <li
             onClick={(e) => props.setSelectedElement(element, e)}
             onContextMenu={(e) => props.onContextMenu(e, element.id)}
@@ -74,7 +82,18 @@ const Layer = ({ element, index, children, updateElement, ...props }) => {
             )}
           </li>
           {children && !element.isCollapsed && (
-            <ul className="nested-layers">{children}</ul>
+            <Droppable droppableId={element.id} type="group-child">
+              {(provided) => (
+                <ul
+                  className="nested-layers"
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
+                  {children}
+                  {provided.placeholder}
+                </ul>
+              )}
+            </Droppable>
           )}
         </div>
       )}
@@ -89,10 +108,7 @@ const LayersPanel = ({
   ...props
 }) => {
   const onDragEnd = (result) => {
-    if (!result.destination) {
-      return;
-    }
-    onReorderElements(result.source.index, result.destination.index);
+    onReorderElements(result);
   };
 
   const renderLayer = (element, index) => {
@@ -128,18 +144,22 @@ const LayersPanel = ({
     return null;
   };
 
+  const topLevelElements = elements.filter((el) => !el.groupId);
+
   return (
     <div className="layers-panel">
       <h3>Layers</h3>
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="layers">
+        <Droppable droppableId="root" type="top-level">
           {(provided) => (
             <ul
               className="layers-list"
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
-              {elements.map((element, index) => renderLayer(element, index))}
+              {topLevelElements.map((element, index) =>
+                renderLayer(element, index)
+              )}
               {provided.placeholder}
             </ul>
           )}

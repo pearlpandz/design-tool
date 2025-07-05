@@ -251,12 +251,68 @@ function App() {
     setSelectedElement(element); // Always set the last clicked as the primary selected element
   };
 
-  const onReorderElements = (startIndex, endIndex) => {
-    const reorderedElements = Array.from(elements);
-    const [removed] = reorderedElements.splice(startIndex, 1);
-    reorderedElements.splice(endIndex, 0, removed);
+  const onReorderElements = (result) => {
+    const { source, destination, draggableId } = result;
 
-    setElements(reorderedElements);
+    if (!destination) {
+      return;
+    }
+
+    const newElements = Array.from(elements);
+    const draggedElement = newElements.find((el) => el.id === draggableId);
+
+    if (!draggedElement) {
+      return;
+    }
+
+    // Remove the dragged element from its original position
+    const currentElements = newElements.filter((el) => el.id !== draggableId);
+
+    // Update the groupId of the dragged element
+    draggedElement.groupId = destination.droppableId === "root" ? undefined : destination.droppableId;
+
+    let absoluteInsertIndex = 0;
+
+    if (destination.droppableId === "root") {
+      // If moving to root, find the correct absolute index among top-level elements
+      const topLevelElements = currentElements.filter(el => !el.groupId);
+      if (destination.index < topLevelElements.length) {
+        const elementBefore = topLevelElements[destination.index];
+        absoluteInsertIndex = currentElements.indexOf(elementBefore);
+      } else {
+        // Insert at the end of top-level elements
+        absoluteInsertIndex = currentElements.length;
+      }
+    } else {
+      // If moving into a group, find the group element and its children
+      const groupElement = currentElements.find(el => el.id === destination.droppableId);
+      if (groupElement) {
+        const groupIndex = currentElements.indexOf(groupElement);
+        const groupChildren = currentElements.filter(el => el.groupId === destination.droppableId);
+
+        if (destination.index < groupChildren.length) {
+          const elementBefore = groupChildren[destination.index];
+          absoluteInsertIndex = currentElements.indexOf(elementBefore);
+        } else {
+          // Insert at the end of the group's children
+          absoluteInsertIndex = groupIndex + groupChildren.length + 1;
+        }
+      } else {
+        // Fallback: if group not found, treat as top-level (shouldn't happen if droppableId is valid)
+        const topLevelElements = currentElements.filter(el => !el.groupId);
+        if (destination.index < topLevelElements.length) {
+          const elementBefore = topLevelElements[destination.index];
+          absoluteInsertIndex = currentElements.indexOf(elementBefore);
+        } else {
+          absoluteInsertIndex = currentElements.length;
+        }
+      }
+    }
+
+    // Insert the dragged element at the calculated absolute index
+    currentElements.splice(absoluteInsertIndex, 0, draggedElement);
+
+    setElements(currentElements);
   };
 
   const exportCanvas = () => {
