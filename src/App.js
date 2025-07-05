@@ -8,7 +8,9 @@ import ContextMenu from "./components/ContextMenu";
 import "./App.css";
 
 function App() {
-  const [elements, setElements] = useState([]);
+  const existingTemplate = localStorage.getItem("template");
+  const initialElements = existingTemplate ? JSON.parse(existingTemplate) : [];
+  const [elements, setElements] = useState(initialElements);
   const [selectedElement, setSelectedElement] = useState(null);
   const [showLayersPanel, setShowLayersPanel] = useState(true);
   const [canvasBackgroundColor, setCanvasBackgroundColor] = useState("#ffffff");
@@ -26,6 +28,8 @@ function App() {
       y: 50,
       stroke: "#000000",
       strokeWidth: 2,
+      opacity: 1,
+      slug: "",
     };
 
     let newElement;
@@ -35,12 +39,17 @@ function App() {
         text: "New Text",
         fill: "#333333",
         strokeWidth: 0, // for text stroke not required
-        width: undefined,
-        height: undefined,
+        width: 200,
+        height: 30,
         fontSize: 20,
         fontFamily: "Arial",
+        lineHeight: 1.2,
+        padding: 0,
+        color: "#333333",
+        fontWeight: "normal",
         fontStyle: "normal",
-        textDecoration: "",
+        textDecoration: [],
+        textAlign: "left",
       };
     } else if (type === "image") {
       newElement = {
@@ -73,7 +82,27 @@ function App() {
         height: 0,
       };
     } else if (type === "square") {
-      newElement = { ...baseProps, fill: "#aabbcc", width: 100, height: 100 };
+      newElement = {
+        ...baseProps,
+        fill: "#aabbcc",
+        width: 100,
+        height: 100,
+        cornerRadiusTopLeft: 0,
+        cornerRadiusTopRight: 0,
+        cornerRadiusBottomLeft: 0,
+        cornerRadiusBottomRight: 0,
+      };
+    } else if (type === "rect") {
+      newElement = {
+        ...baseProps,
+        fill: "#aabbcc",
+        width: 100,
+        height: 100,
+        cornerRadiusTopLeft: 0,
+        cornerRadiusTopRight: 0,
+        cornerRadiusBottomLeft: 0,
+        cornerRadiusBottomRight: 0,
+      };
     } else if (type === "polygon") {
       newElement = {
         ...baseProps,
@@ -84,7 +113,13 @@ function App() {
         height: 100,
       };
     } else if (type === "circle") {
-      newElement = { ...baseProps, fill: "#aabbcc", radius: 50, width: 100, height: 100 };
+      newElement = {
+        ...baseProps,
+        fill: "#aabbcc",
+        radius: 50,
+        width: 100,
+        height: 100,
+      };
     } else {
       newElement = { ...baseProps, fill: "#aabbcc", width: 100, height: 100 };
     }
@@ -106,6 +141,10 @@ function App() {
             properties.width !== undefined
           ) {
             updatedEl.height = updatedEl.width;
+            updatedEl.cornerRadiusTopLeft = el.cornerRadiusTopLeft;
+            updatedEl.cornerRadiusTopRight = el.cornerRadiusTopRight;
+            updatedEl.cornerRadiusBottomLeft = el.cornerRadiusBottomLeft;
+            updatedEl.cornerRadiusBottomRight = el.cornerRadiusBottomRight;
           }
           return updatedEl;
         }
@@ -276,13 +315,14 @@ function App() {
     const currentElements = newElements.filter((el) => el.id !== draggableId);
 
     // Update the groupId of the dragged element
-    draggedElement.groupId = destination.droppableId === "root" ? undefined : destination.droppableId;
+    draggedElement.groupId =
+      destination.droppableId === "root" ? undefined : destination.droppableId;
 
     let absoluteInsertIndex = 0;
 
     if (destination.droppableId === "root") {
       // If moving to root, find the correct absolute index among top-level elements
-      const topLevelElements = currentElements.filter(el => !el.groupId);
+      const topLevelElements = currentElements.filter((el) => !el.groupId);
       if (destination.index < topLevelElements.length) {
         const elementBefore = topLevelElements[destination.index];
         absoluteInsertIndex = currentElements.indexOf(elementBefore);
@@ -292,10 +332,14 @@ function App() {
       }
     } else {
       // If moving into a group, find the group element and its children
-      const groupElement = currentElements.find(el => el.id === destination.droppableId);
+      const groupElement = currentElements.find(
+        (el) => el.id === destination.droppableId
+      );
       if (groupElement) {
         const groupIndex = currentElements.indexOf(groupElement);
-        const groupChildren = currentElements.filter(el => el.groupId === destination.droppableId);
+        const groupChildren = currentElements.filter(
+          (el) => el.groupId === destination.droppableId
+        );
 
         if (destination.index < groupChildren.length) {
           const elementBefore = groupChildren[destination.index];
@@ -306,7 +350,7 @@ function App() {
         }
       } else {
         // Fallback: if group not found, treat as top-level (shouldn't happen if droppableId is valid)
-        const topLevelElements = currentElements.filter(el => !el.groupId);
+        const topLevelElements = currentElements.filter((el) => !el.groupId);
         if (destination.index < topLevelElements.length) {
           const elementBefore = topLevelElements[destination.index];
           absoluteInsertIndex = currentElements.indexOf(elementBefore);
@@ -334,7 +378,8 @@ function App() {
 
   const saveTemplate = () => {
     const template = JSON.stringify(elements);
-    prompt("Copy this template JSON:", template);
+    localStorage.setItem("template", template);
+    alert("template JSON stored in localstorage");
   };
 
   const loadTemplate = () => {

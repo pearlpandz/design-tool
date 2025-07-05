@@ -20,6 +20,12 @@ const GeneralShape = forwardRef((props, ref) => {
     case "rect":
     case "square":
       KonvaShape = Rect;
+      props.shapeProps.cornerRadius = [
+        props.shapeProps.cornerRadiusTopLeft || 0,
+        props.shapeProps.cornerRadiusTopRight || 0,
+        props.shapeProps.cornerRadiusBottomRight || 0,
+        props.shapeProps.cornerRadiusBottomLeft || 0,
+      ];
       break;
     case "circle":
       KonvaShape = Circle;
@@ -29,6 +35,9 @@ const GeneralShape = forwardRef((props, ref) => {
       break;
     case "text":
       KonvaShape = Text;
+      break;
+    case "group":
+      KonvaShape = Group;
       break;
     case "polygon":
       KonvaShape = RegularPolygon;
@@ -40,6 +49,16 @@ const GeneralShape = forwardRef((props, ref) => {
     <KonvaShape
       ref={ref}
       {...shapeProps}
+      {...(shapeProps.type === "text"
+        ? {
+            fill: shapeProps.color,
+            fontStyle: `${shapeProps.fontStyle} ${shapeProps.fontWeight}`.trim(),
+            align: shapeProps.textAlign,
+            textDecoration: shapeProps.textDecoration.join(' '),
+            lineHeight: shapeProps.lineHeight,
+            padding: shapeProps.padding,
+          }
+        : {})}
       onClick={(e) => {
         onSelect(shapeProps, e);
         e.cancelBubble = true;
@@ -284,6 +303,7 @@ const ElementRenderer = ({
           draggable: isSelected,
           onDragEnd: handleDragEnd,
           onTransformEnd: handleTransformEnd,
+          opacity: element.opacity,
         }}
         onSelect={onSelect}
         onContextMenu={onContextMenu}

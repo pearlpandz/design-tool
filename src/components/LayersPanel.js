@@ -76,7 +76,7 @@ const Layer = ({ element, index, children, updateElement, ...props }) => {
               </span>
             )}
             <span className="layer-icon">{getLayerIcon(element.type)}</span>
-            {element.type} - {element.id.substring(0, 4)}
+            {element.type} - {element.slug || element.id.substring(0, 4)}
             {element.isClippingMask && (
               <span className="clip-indicator"> (Mask)</span>
             )}

@@ -49,8 +49,14 @@ const PropertiesPanel = ({
   setCanvasBackgroundColor,
 }) => {
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    updateElement(selectedElement.id, { [name]: value });
+    const { name, value, type } = e.target;
+    if (type === "number") {
+      updateElement(selectedElement.id, {
+        [name]: e?.target?.valueAsNumber ?? Number(value),
+      });
+    } else {
+      updateElement(selectedElement.id, { [name]: value });
+    }
   };
 
   const handleColorChange = (color, name) => {
@@ -84,7 +90,26 @@ const PropertiesPanel = ({
             onChange={handleChange}
           />
 
-          {selectedElement.type !== "text" && (
+          <label>Opacity:</label>
+          <input
+            type="number"
+            name="opacity"
+            min="0"
+            max="1"
+            step="0.01"
+            value={selectedElement.opacity}
+            onChange={handleChange}
+          />
+
+          <label>Slug:</label>
+          <input
+            type="text"
+            name="slug"
+            value={selectedElement.slug || ""}
+            onChange={handleChange}
+          />
+
+          {selectedElement.type !== "group" && (
             <>
               <label>Width:</label>
               <input
@@ -100,6 +125,39 @@ const PropertiesPanel = ({
                 value={selectedElement.height}
                 onChange={handleChange}
               />
+              {(selectedElement.type === "rect" ||
+                selectedElement.type === "square") && (
+                <>
+                  <label>Corner Radius Top Left:</label>
+                  <input
+                    type="number"
+                    name="cornerRadiusTopLeft"
+                    value={selectedElement.cornerRadiusTopLeft || 0}
+                    onChange={handleChange}
+                  />
+                  <label>Corner Radius Top Right:</label>
+                  <input
+                    type="number"
+                    name="cornerRadiusTopRight"
+                    value={selectedElement.cornerRadiusTopRight || 0}
+                    onChange={handleChange}
+                  />
+                  <label>Corner Radius Bottom Left:</label>
+                  <input
+                    type="number"
+                    name="cornerRadiusBottomLeft"
+                    value={selectedElement.cornerRadiusBottomLeft || 0}
+                    onChange={handleChange}
+                  />
+                  <label>Corner Radius Bottom Right:</label>
+                  <input
+                    type="number"
+                    name="cornerRadiusBottomRight"
+                    value={selectedElement.cornerRadiusBottomRight || 0}
+                    onChange={handleChange}
+                  />
+                </>
+              )}
             </>
           )}
 
@@ -133,17 +191,36 @@ const PropertiesPanel = ({
                 ))}
               </select>
 
+              <label>Line Height:</label>
+              <input
+                type="number"
+                name="lineHeight"
+                value={selectedElement.lineHeight}
+                onChange={handleChange}
+              />
+
+              <label>Padding:</label>
+              <input
+                type="number"
+                name="padding"
+                value={selectedElement.padding}
+                onChange={handleChange}
+              />
+
+              <label>Color:</label>
+              <ColorPickerInput
+                color={selectedElement.color}
+                onChange={(color) => handleColorChange(color, "color")}
+              />
+
               <label>
                 <input
                   type="checkbox"
                   name="bold"
-                  checked={
-                    selectedElement.fontStyle &&
-                    selectedElement.fontStyle.includes("bold")
-                  }
+                  checked={selectedElement.fontWeight === "bold"}
                   onChange={(e) =>
                     updateElement(selectedElement.id, {
-                      fontStyle: e.target.checked ? "bold" : "normal",
+                      fontWeight: e.target.checked ? "bold" : "normal",
                     })
                   }
                 />
@@ -153,10 +230,7 @@ const PropertiesPanel = ({
                 <input
                   type="checkbox"
                   name="italic"
-                  checked={
-                    selectedElement.fontStyle &&
-                    selectedElement.fontStyle.includes("italic")
-                  }
+                  checked={selectedElement.fontStyle === "italic"}
                   onChange={(e) =>
                     updateElement(selectedElement.id, {
                       fontStyle: e.target.checked ? "italic" : "normal",
@@ -169,15 +243,17 @@ const PropertiesPanel = ({
                 <input
                   type="checkbox"
                   name="underline"
-                  checked={
-                    selectedElement.textDecoration &&
-                    selectedElement.textDecoration.includes("underline")
-                  }
-                  onChange={(e) =>
+                  checked={selectedElement.textDecoration.includes("underline")}
+                  onChange={(e) => {
+                    const newTextDecoration = e.target.checked
+                      ? [...selectedElement.textDecoration, "underline"]
+                      : selectedElement.textDecoration.filter(
+                          (dec) => dec !== "underline"
+                        );
                     updateElement(selectedElement.id, {
-                      textDecoration: e.target.checked ? "underline" : "",
-                    })
-                  }
+                      textDecoration: newTextDecoration,
+                    });
+                  }}
                 />
                 Underline
               </label>
@@ -185,18 +261,32 @@ const PropertiesPanel = ({
                 <input
                   type="checkbox"
                   name="line-through"
-                  checked={
-                    selectedElement.textDecoration &&
-                    selectedElement.textDecoration.includes("line-through")
-                  }
-                  onChange={(e) =>
+                  checked={selectedElement.textDecoration.includes(
+                    "line-through"
+                  )}
+                  onChange={(e) => {
+                    const newTextDecoration = e.target.checked
+                      ? [...selectedElement.textDecoration, "line-through"]
+                      : selectedElement.textDecoration.filter(
+                          (dec) => dec !== "line-through"
+                        );
                     updateElement(selectedElement.id, {
-                      textDecoration: e.target.checked ? "line-through" : "",
-                    })
-                  }
+                      textDecoration: newTextDecoration,
+                    });
+                  }}
                 />
                 Line-through
               </label>
+              <label>Alignment:</label>
+              <select
+                name="textAlign"
+                value={selectedElement.textAlign}
+                onChange={handleChange}
+              >
+                <option value="left">Left</option>
+                <option value="center">Center</option>
+                <option value="right">Right</option>
+              </select>
             </>
           )}
 
