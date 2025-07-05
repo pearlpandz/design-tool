@@ -1,20 +1,16 @@
-import React from "react";
-import {
-  FaSquare,
-  FaCircle,
-  FaMinus,
-  FaTextHeight,
-  FaImage,
-  FaDownload,
-  FaSave,
-  FaFolderOpen,
-  FaLayerGroup,
-  FaSquareFull,
-  FaDrawPolygon,
-  FaVideo,
-} from "react-icons/fa";
-import { MdGif } from "react-icons/md";
+import { FaRegSquare, FaRegCircle, FaRegFolder } from "react-icons/fa";
+import { MdFileDownload } from "react-icons/md";
 import { LuRectangleHorizontal } from "react-icons/lu";
+import { FiMinus } from "react-icons/fi";
+import {
+  IoImageOutline,
+  IoLayersOutline,
+  IoSaveOutline,
+  IoTextOutline,
+  IoVideocamOutline,
+} from "react-icons/io5";
+import { GiFilmStrip } from "react-icons/gi";
+import { LiaDrawPolygonSolid } from "react-icons/lia";
 
 const Toolbar = ({
   addElement,
@@ -29,40 +25,40 @@ const Toolbar = ({
         <LuRectangleHorizontal />
       </button>
       <button onClick={() => addElement("square")} title="Add Square">
-        <FaSquareFull />
+        <FaRegSquare />
       </button>
       <button onClick={() => addElement("circle")} title="Add Circle">
-        <FaCircle />
+        <FaRegCircle />
       </button>
       <button onClick={() => addElement("line")} title="Add Line">
-        <FaMinus />
+        <FiMinus />
       </button>
       <button onClick={() => addElement("polygon")} title="Add Polygon">
-        <FaDrawPolygon />
+        <LiaDrawPolygonSolid />
       </button>
       <button onClick={() => addElement("text")} title="Add Text">
-        <FaTextHeight />
+        <IoTextOutline />
       </button>
       <button onClick={() => addElement("image")} title="Add Image">
-        <FaImage />
+        <IoImageOutline />
       </button>
       <button onClick={() => addElement("gif")} title="Add GIF">
-        <MdGif />
+        <GiFilmStrip />
       </button>
       <button onClick={() => addElement("video")} title="Add Video">
-        <FaVideo />
+        <IoVideocamOutline />
       </button>
       <button onClick={exportCanvas} title="Download PNG">
-        <FaDownload />
+        <MdFileDownload />
       </button>
       <button onClick={saveTemplate} title="Save Template">
-        <FaSave />
+        <IoSaveOutline />
       </button>
       <button onClick={loadTemplate} title="Load Template">
-        <FaFolderOpen />
+        <FaRegFolder />
       </button>
       <button onClick={toggleLayersPanel} title="Toggle Layers Panel">
-        <FaLayerGroup />
+        <IoLayersOutline />
       </button>
     </div>
   );

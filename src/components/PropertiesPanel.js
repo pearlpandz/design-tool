@@ -118,6 +118,44 @@ const PropertiesPanel = ({
         overflowY: "auto",
       }}
     >
+      {/* TEMPLATE PROPERTIES SECTION */}
+      <div style={sectionTitleStyle}>TEMPLATE PROPERTIES</div>
+      <div style={rowStyle}>
+        <span style={{...labelStyle, minWidth: '100px'}}>TEMPLATE NAME</span>
+        <input
+          type="text"
+          name="templateName"
+          // value={templateName}
+          // onChange={(e) => setTemplateName(e.target.value)}
+          style={{ ...inputStyle, width: "120px" }}
+        />
+      </div>
+      <div style={rowStyle}>
+        <span style={{...labelStyle, minWidth: '100px'}}>CATEGORY</span>
+        <select
+          name="category"
+          // value={category}
+          // onChange={(e) => setCategory(e.target.value)}
+          style={{ ...inputStyle, width: "120px" }}
+        >
+          <option value="regular">Regular</option>
+          <option value="political">Political</option>
+          <option value="product">Product</option>
+        </select>
+      </div>
+      <div style={rowStyle}>
+        <span style={{...labelStyle, minWidth: '100px'}}>STATE</span>
+        <select
+          name="state"
+          // value={state}
+          // onChange={(e) => setState(e.target.value)}
+          style={{ ...inputStyle, width: "120px" }}
+        >
+          <option value="draft">Draft</option>
+          <option value="production">Production</option>
+        </select>
+      </div>
+
       {selectedElement && (
         <>
           {/* TRANSFORM SECTION */}
@@ -537,4 +575,3 @@ const PropertiesPanel = ({
 };
 
 export default PropertiesPanel;
-              
