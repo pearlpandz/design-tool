@@ -340,11 +340,17 @@ const ElementRenderer = ({
 
         ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, Math.PI * 2);
       } else if (mask.type === "pen") {
-        if (mask.points && mask.points.length > 1) {
-          ctx.moveTo(mask.points[0], mask.points[1]);
-          for (let i = 2; i < mask.points.length; i += 2) {
-            ctx.lineTo(mask.points[i], mask.points[i + 1]);
+        const points = mask.points;
+        if (points && points.length > 3) {
+          ctx.moveTo(points[0], points[1]);
+          for (let i = 2; i < points.length - 2; i += 2) {
+            const xc = (points[i] + points[i + 2]) / 2;
+            const yc = (points[i + 1] + points[i + 3]) / 2;
+            ctx.quadraticCurveTo(points[i], points[i + 1], xc, yc);
           }
+          // last segment
+          ctx.lineTo(points[points.length - 2], points[points.length - 1]);
+
           if (mask.isClosed) {
             ctx.closePath();
           }
