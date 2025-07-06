@@ -311,6 +311,7 @@ function App() {
     });
   };
 
+  // eslint-disable-next-line no-unused-vars
   const handleCanvasClick = () => {
     setContextMenu(null);
   };
@@ -362,6 +363,7 @@ function App() {
   };
 
   const onReorderElements = (result) => {
+    // eslint-disable-next-line no-unused-vars
     const { source, destination, draggableId } = result;
 
     if (!destination) {

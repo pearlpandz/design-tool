@@ -18,7 +18,7 @@ import Ellipse from "./Ellipse";
 import Pen from "./Pen";
 
 const GeneralShape = forwardRef((props, ref) => {
-  const { shapeProps, onSelect, onContextMenu } = props;
+  const { shapeProps, onSelect, onContextMenu, onPointDrag } = props;
   let KonvaShape;
   switch (shapeProps.type) {
     case "rect":
@@ -61,6 +61,7 @@ const GeneralShape = forwardRef((props, ref) => {
     default:
       return null;
   }
+
   return (
     <KonvaShape
       ref={ref}
@@ -75,6 +76,9 @@ const GeneralShape = forwardRef((props, ref) => {
             lineHeight: shapeProps.lineHeight,
             padding: shapeProps.padding,
           }
+        : {})}
+      {...(shapeProps.type === "pen" && props.isSelected
+        ? { activatePoints: true, onPointDrag: onPointDrag }
         : {})}
       onClick={(e) => {
         onSelect(shapeProps, e);
@@ -130,7 +134,7 @@ const ImageBasedShape = forwardRef((props, ref) => {
 });
 
 const Shape = forwardRef((props, ref) => {
-  const { shapeProps } = props;
+  const { shapeProps, onPointDrag, isSelected } = props;
   if (
     shapeProps.type === "image" ||
     shapeProps.type === "gif" ||
@@ -138,7 +142,14 @@ const Shape = forwardRef((props, ref) => {
   ) {
     return <ImageBasedShape ref={ref} {...props} />;
   }
-  return <GeneralShape ref={ref} {...props} />;
+  return (
+    <GeneralShape
+      ref={ref}
+      {...props}
+      onPointDrag={onPointDrag}
+      isSelected={isSelected}
+    />
+  );
 });
 
 const ElementRenderer = ({
@@ -150,6 +161,9 @@ const ElementRenderer = ({
   onContextMenu,
   currentTool,
 }) => {
+  const handlePointDrag = (newPoints) => {
+    onChange(element.id, { points: newPoints });
+  };
   const shapeRef = useRef();
   const trRef = useRef();
   const maskRef = useRef();
@@ -392,6 +406,7 @@ const ElementRenderer = ({
           onDragEnd: handleDragEnd,
           onTransformEnd: handleTransformEnd,
           opacity: element.opacity,
+          onPointDrag: handlePointDrag,
         }}
         onSelect={onSelect}
         onContextMenu={onContextMenu}
@@ -423,7 +438,10 @@ const Canvas = ({
   const handleStageClick = (e) => {
     console.log("Canvas: handleStageClick - currentTool:", currentTool);
     console.log("Canvas: handleStageClick - selectedElement:", selectedElement);
-    if (e.target.name() === "canvas-background" || e.target.nodeType === "Stage") {
+    if (
+      e.target.name() === "canvas-background" ||
+      e.target.nodeType === "Stage"
+    ) {
       if (currentTool === "pen") {
         const pointerPosition = e.target.getStage().getPointerPosition();
         onAddPoint(pointerPosition);

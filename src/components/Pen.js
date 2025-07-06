@@ -14,11 +14,21 @@ export default function Pen({
   ...rest
 }) {
   const shapeRef = useRef();
-  const { x = 0, y = 0, scaleX = 1, scaleY = 1, bgColor, strokeColor, strokeWidth, opacity = 100, ...otherRest } = rest;
+  const {
+    x = 0,
+    y = 0,
+    scaleX = 1,
+    scaleY = 1,
+    bgColor,
+    strokeColor,
+    strokeWidth,
+    opacity = 100,
+    ...otherRest
+  } = rest;
   const konvaOpacity = opacity / 100;
 
   const mappedPoints = useMemo(() => {
-    if (!points || !activatePoints) return [];
+    if (!points) return [];
     const mappedPoints = [];
     for (let i = 0; i < points.length; i += 2) {
       mappedPoints.push({
@@ -27,13 +37,13 @@ export default function Pen({
       });
     }
     return mappedPoints;
-  }, [points, x, y, scaleX, scaleY, activatePoints]);
+  }, [points, x, y, scaleX, scaleY]);
 
   const hoverRef = useRef(null);
 
-  useEffect(() => {
-    document.body.style.cursor = "default";
-  }, [activatePoints]);
+  // useEffect(() => {
+  //   document.body.style.cursor = "default";
+  // }, [activatePoints]);
 
   const handleDragEnd = (e) => {
     const { onClick, draggable, ...element } = rest;
@@ -56,7 +66,7 @@ export default function Pen({
       scaleY: node.scaleY(),
       rotation: node.rotation(),
     });
-  }
+  };
   return (
     <>
       <Line
