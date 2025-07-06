@@ -186,6 +186,10 @@ function App() {
             updatedEl.cornerRadiusTopRight = el.cornerRadiusTopRight;
             updatedEl.cornerRadiusBottomLeft = el.cornerRadiusBottomLeft;
             updatedEl.cornerRadiusBottomRight = el.cornerRadiusBottomRight;
+          } else if (updatedEl.type === "polygon" && properties.sides !== undefined) {
+            // No specific Konva property to update based on sides directly here,
+            // Konva.RegularPolygon will use the 'sides' prop directly.
+            // Ensure 'radius' is also passed if it's a property that affects rendering.
           }
           return updatedEl;
         }

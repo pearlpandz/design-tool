@@ -704,6 +704,22 @@ const PropertiesPanel = ({
             </>
           )}
 
+          {selectedElement.type === "polygon" && (
+            <>
+              <div style={sectionTitleStyle}>POLYGON PROPERTIES</div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>SIDES</span>
+                <input
+                  type="number"
+                  name="sides"
+                  value={selectedElement.sides}
+                  onChange={handleChange}
+                  style={inputStyle}
+                />
+              </div>
+            </>
+          )}
+
           {selectedElement.type === "pen" && (
             <>
               <div style={sectionTitleStyle}>PEN PROPERTIES</div>
