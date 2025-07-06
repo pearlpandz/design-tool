@@ -407,6 +407,7 @@ const ElementRenderer = ({
           onTransformEnd: handleTransformEnd,
           opacity: element.opacity,
           onPointDrag: handlePointDrag,
+          isSelected: isSelected,
         }}
         onSelect={onSelect}
         onContextMenu={onContextMenu}

@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { Circle, Line } from "react-konva";
 
 export default function Pen({
@@ -32,12 +32,12 @@ export default function Pen({
     const mappedPoints = [];
     for (let i = 0; i < points.length; i += 2) {
       mappedPoints.push({
-        x: points[i] * scaleX + x,
-        y: points[i + 1] * scaleY + y,
+        x: points[i] * scaleX,
+        y: points[i + 1] * scaleY,
       });
     }
     return mappedPoints;
-  }, [points, x, y, scaleX, scaleY]);
+  }, [points, scaleX, scaleY]);
 
   const hoverRef = useRef(null);
 
@@ -67,6 +67,67 @@ export default function Pen({
       rotation: node.rotation(),
     });
   };
+
+  const handleClick = (e) => {
+    console.log("Pen.js: Line onClick - currentTool:", currentTool);
+    console.log("Pen.js: Line onClick - onAddPoint:", onAddPoint);
+    if (e.evt.button === 0) {
+      if (currentTool === "pen") {
+        const pointerPosition = e.target.getStage().getPointerPosition();
+        onAddPoint(pointerPosition);
+      } else {
+        rest.onSelect(e.evt.shiftKey || e.evt.ctrlKey);
+      }
+    }
+  };
+
+  const handleTap = (e) => {
+    console.log("Pen.js: Line onTap - currentTool:", currentTool);
+    console.log("Pen.js: Line onTap - onAddPoint:", onAddPoint);
+    if (e.evt.button === 0) {
+      if (currentTool === "pen") {
+        const pointerPosition = e.target.getStage().getPointerPosition();
+        onAddPoint(pointerPosition);
+      } else {
+        rest.onSelect(e.evt.shiftKey || e.evt.ctrlKey);
+      }
+    }
+  };
+
+  const handlePointMouseOver = (e) => {
+    e.target.setAttr("fill", "#eee");
+    document.body.style.cursor = "pointer";
+    hoverRef?.current?.setAttrs({
+      x: e.target.x(),
+      y: e.target.y(),
+      visible: true,
+    });
+  };
+
+  const handlePointMouseOut = (e) => {
+    e.target.setAttr("fill", "white");
+    document.body.style.cursor = "default";
+    hoverRef?.current?.setAttrs({
+      visible: false,
+    });
+  };
+
+  const handlePointDragMove = (e, index) => {
+    const x = e.target.x();
+    const y = e.target.y();
+
+    const newPoints = [...(points || [])];
+    newPoints[index * 2] = x;
+    newPoints[index * 2 + 1] = y;
+    onPointDrag(newPoints);
+
+    hoverRef?.current?.setAttrs({
+      x,
+      y,
+      visible: true,
+    });
+  };
+
   return (
     <>
       <Line
@@ -81,77 +142,28 @@ export default function Pen({
         onTransformEnd={handleTransformEnd}
         fill={bgColor}
         opacity={konvaOpacity}
-        onClick={(e) => {
-          console.log("Pen.js: Line onClick - currentTool:", currentTool);
-          console.log("Pen.js: Line onClick - onAddPoint:", onAddPoint);
-          if (e.evt.button === 0) {
-            if (currentTool === "pen") {
-              const pointerPosition = e.target.getStage().getPointerPosition();
-              onAddPoint(pointerPosition);
-            } else {
-              rest.onSelect(e.evt.shiftKey || e.evt.ctrlKey);
-            }
-          }
-        }}
-        onTap={(e) => {
-          console.log("Pen.js: Line onTap - currentTool:", currentTool);
-          console.log("Pen.js: Line onTap - onAddPoint:", onAddPoint);
-          if (e.evt.button === 0) {
-            if (currentTool === "pen") {
-              const pointerPosition = e.target.getStage().getPointerPosition();
-              onAddPoint(pointerPosition);
-            } else {
-              rest.onSelect(e.evt.shiftKey || e.evt.ctrlKey);
-            }
-          }
-        }}
+        onClick={handleClick}
+        onTap={handleTap}
         closed={isClosed}
         {...otherRest}
       />
-      {mappedPoints.map((point, index) => {
-        return (
-          <Circle
-            x={point.x}
-            y={point.y}
-            radius={5}
-            fill="white"
-            stroke="#8986E3"
-            strokeWidth={1}
-            draggable
-            onMouseOver={(e) => {
-              e.target.setAttr("fill", "#eee");
-              document.body.style.cursor = "pointer";
-              hoverRef?.current?.setAttrs({
-                x: e.target.x(),
-                y: e.target.y(),
-                visible: true,
-              });
-            }}
-            onMouseOut={(e) => {
-              e.target.setAttr("fill", "white");
-              document.body.style.cursor = "default";
-              hoverRef?.current?.setAttrs({
-                visible: false,
-              });
-            }}
-            onDragMove={(e) => {
-              const x = e.target.x();
-              const y = e.target.y();
-
-              const newPoints = [...(points || [])];
-              newPoints[index * 2] = x;
-              newPoints[index * 2 + 1] = y;
-              onPointDrag(newPoints);
-
-              hoverRef?.current?.setAttrs({
-                x,
-                y,
-                visible: true,
-              });
-            }}
-          />
-        );
-      })}
+      {isSelected &&
+        mappedPoints.map((point, index) => {
+          return (
+            <Circle
+              x={point.x}
+              y={point.y}
+              radius={5}
+              fill="white"
+              stroke="#8986E3"
+              strokeWidth={1}
+              draggable
+              onMouseOver={handlePointMouseOver}
+              onMouseOut={handlePointMouseOut}
+              onDragMove={(e) => handlePointDragMove(e, index)}
+            />
+          );
+        })}
     </>
   );
 }
