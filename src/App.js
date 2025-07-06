@@ -14,6 +14,7 @@ function App() {
   const [selectedElement, setSelectedElement] = useState(null);
   const [showLayersPanel, setShowLayersPanel] = useState(true);
   const [canvasBackgroundColor, setCanvasBackgroundColor] = useState("#ffffff");
+  const [currentTool, setCurrentTool] = useState(null);
   const stageRef = useRef();
 
   const [contextMenu, setContextMenu] = useState(null);
@@ -28,12 +29,22 @@ function App() {
       y: 50,
       stroke: "#000000",
       strokeWidth: 2,
-      opacity: 1,
+      opacity: 100,
       slug: "",
     };
 
     let newElement;
-    if (type === "text") {
+    if (type === "pen") {
+      newElement = {
+        ...baseProps,
+        points: [],
+        fill: "#333333",
+        stroke: "#000000",
+        strokeWidth: 2,
+        isClosed: true,
+      };
+      setCurrentTool("pen");
+    } else if (type === "text") {
       newElement = {
         ...baseProps,
         text: "New Text",
@@ -153,6 +164,7 @@ function App() {
       newElement = { ...baseProps, fill: "#aabbcc", width: 100, height: 100 };
     }
     setElements([...elements, newElement]);
+    setSelectedElement(newElement);
   };
 
   const updateElement = (id, properties) => {
@@ -300,6 +312,8 @@ function App() {
   };
 
   const handleSelectElement = (element, event) => {
+    console.log("handleSelectElement: element", element);
+    console.log("handleSelectElement: currentTool", currentTool);
     if (!element) {
       setSelectedElement(null);
       setSelectedElementsForClipping([]);
@@ -324,6 +338,23 @@ function App() {
       setSelectedElementsForClipping([element.id]);
     }
     setSelectedElement(element); // Always set the last clicked as the primary selected element
+  };
+
+  const onAddPoint = (pointerPosition) => {
+    console.log("onAddPoint called. pointerPosition:", pointerPosition);
+    console.log("onAddPoint: selectedElement:", selectedElement);
+    if (selectedElement && selectedElement.type === "pen") {
+      console.log("onAddPoint: selectedElement is pen. Adding point.");
+      const newPoints = [
+        ...selectedElement.points,
+        pointerPosition.x,
+        pointerPosition.y,
+      ];
+      updateElement(selectedElement.id, { points: newPoints });
+      console.log("onAddPoint: newPoints:", newPoints);
+    } else {
+      console.log("onAddPoint: selectedElement is NOT pen or is null.");
+    }
   };
 
   const onReorderElements = (result) => {
@@ -427,7 +458,7 @@ function App() {
   };
 
   return (
-    <div className="App" onClick={handleCanvasClick}>
+    <div className="App">
       <div className="main-container">
         <Toolbar
           addElement={addElement}
@@ -455,6 +486,8 @@ function App() {
           stageRef={stageRef}
           onContextMenu={handleContextMenu}
           canvasBackgroundColor={canvasBackgroundColor}
+          currentTool={currentTool}
+          onAddPoint={onAddPoint}
         />
         <PropertiesPanel
           selectedElement={selectedElement}

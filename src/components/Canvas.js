@@ -15,6 +15,7 @@ import useImage from "use-image";
 import Star from "./Star";
 import Arc from "./Arc";
 import Ellipse from "./Ellipse";
+import Pen from "./Pen";
 
 const GeneralShape = forwardRef((props, ref) => {
   const { shapeProps, onSelect, onContextMenu } = props;
@@ -53,6 +54,9 @@ const GeneralShape = forwardRef((props, ref) => {
       break;
     case "ellipse":
       KonvaShape = Ellipse;
+      break;
+    case "pen":
+      KonvaShape = Pen;
       break;
     default:
       return null;
@@ -144,6 +148,7 @@ const ElementRenderer = ({
   onSelect,
   onChange,
   onContextMenu,
+  currentTool,
 }) => {
   const shapeRef = useRef();
   const trRef = useRef();
@@ -320,6 +325,16 @@ const ElementRenderer = ({
         const radiusY = mask.radiusY;
 
         ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, Math.PI * 2);
+      } else if (mask.type === "pen") {
+        if (mask.points && mask.points.length > 1) {
+          ctx.moveTo(mask.points[0], mask.points[1]);
+          for (let i = 2; i < mask.points.length; i += 2) {
+            ctx.lineTo(mask.points[i], mask.points[i + 1]);
+          }
+          if (mask.isClosed) {
+            ctx.closePath();
+          }
+        }
       }
       ctx.clip();
     };
@@ -402,10 +417,19 @@ const Canvas = ({
   stageRef,
   onContextMenu,
   canvasBackgroundColor,
+  currentTool,
+  onAddPoint,
 }) => {
   const handleStageClick = (e) => {
-    if (e.target === e.target.getStage()) {
-      setSelectedElement(null);
+    console.log("Canvas: handleStageClick - currentTool:", currentTool);
+    console.log("Canvas: handleStageClick - selectedElement:", selectedElement);
+    if (e.target.name() === "canvas-background" || e.target.nodeType === "Stage") {
+      if (currentTool === "pen") {
+        const pointerPosition = e.target.getStage().getPointerPosition();
+        onAddPoint(pointerPosition);
+      } else {
+        setSelectedElement(null);
+      }
     }
   };
 
@@ -436,8 +460,7 @@ const Canvas = ({
           width={600}
           height={600}
           fill={canvasBackgroundColor}
-          onClick={() => setSelectedElement(null)}
-          onTap={() => setSelectedElement(null)}
+          name="canvas-background"
         />
         {topLevelElements.map((element) => (
           <ElementRenderer
@@ -448,6 +471,8 @@ const Canvas = ({
             onSelect={setSelectedElement}
             onChange={updateElement}
             onContextMenu={onContextMenu}
+            currentTool={currentTool}
+            onAddPoint={onAddPoint}
           />
         ))}
       </Layer>

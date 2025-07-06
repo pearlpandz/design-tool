@@ -704,7 +704,25 @@ const PropertiesPanel = ({
             </>
           )}
 
-          {/* ...existing code for text options, image/video/polygon, etc., can be grouped or hidden as needed... */}
+          {selectedElement.type === "pen" && (
+            <>
+              <div style={sectionTitleStyle}>PEN PROPERTIES</div>
+              <div style={rowStyle}>
+                <span style={labelStyle}>CLOSED</span>
+                <input
+                  type="checkbox"
+                  name="isClosed"
+                  checked={selectedElement.isClosed || false}
+                  onChange={(e) =>
+                    updateElement(selectedElement.id, {
+                      isClosed: e.target.checked,
+                    })
+                  }
+                />
+              </div>
+              {/* Bezier properties will go here */}
+            </>
+          )}
         </>
       )}
     </div>

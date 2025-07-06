@@ -28,6 +28,8 @@ const getLayerIcon = (type) => {
       return "📁";
     case "star":
       return "⭐";
+    case "pen":
+      return "✍️";
     default:
       return "❓";
   }
