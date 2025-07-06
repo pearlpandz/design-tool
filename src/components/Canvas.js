@@ -201,7 +201,7 @@ const ElementRenderer = ({
         trRef.current.getLayer().batchDraw();
       }
     }
-  }, [isSelected, element.type]);
+  }, [isSelected, element.type, mode]);
 
   const handleDragEnd = (e) => {
     if (mode === "edit") {
