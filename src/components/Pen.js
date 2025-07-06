@@ -48,7 +48,12 @@ export default function Pen({
 
   const handleDragEnd = (e) => {
     const { onClick, draggable, ...element } = rest;
-    onChange({ ...element, x: e.target.x(), y: e.target.y() });
+    onChange({
+      ...element,
+      x: e.target.x(),
+      y: e.target.y(),
+      isSelected: true,
+    });
   };
 
   const handleTransformEnd = (e) => {
@@ -95,8 +100,8 @@ export default function Pen({
     e.target.setAttr("fill", "#eee");
     document.body.style.cursor = "pointer";
     hoverRef?.current?.setAttrs({
-      x: e.target.x(),
-      y: e.target.y(),
+      x: x + e.target.x(),
+      y: y + e.target.y(),
       visible: true,
     });
   };
@@ -110,17 +115,17 @@ export default function Pen({
   };
 
   const handlePointDragMove = (e, index) => {
-    const x = e.target.x();
-    const y = e.target.y();
+    const newX = e.target.x() - x;
+    const newY = e.target.y() - y;
 
     const newPoints = [...(points || [])];
-    newPoints[index * 2] = x;
-    newPoints[index * 2 + 1] = y;
+    newPoints[index * 2] = newX;
+    newPoints[index * 2 + 1] = newY;
     onPointDrag(newPoints);
 
     hoverRef?.current?.setAttrs({
-      x,
-      y,
+      x: e.target.x(),
+      y: e.target.y(),
       visible: true,
     });
   };
@@ -148,8 +153,8 @@ export default function Pen({
         mappedPoints.map((point, index) => {
           return (
             <Circle
-              x={point.x}
-              y={point.y}
+              x={x + point.x}
+              y={y + point.y}
               radius={5}
               fill="white"
               stroke="#8986E3"
