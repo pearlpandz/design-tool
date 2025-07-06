@@ -65,7 +65,7 @@ function App() {
     } else if (type === "image") {
       newElement = {
         ...baseProps,
-        src: "https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f",
+        src: "https://frame-service.creavo.in/uploads/placeholder-image.jpg",
         width: 150,
         height: 150,
       };
