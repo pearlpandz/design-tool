@@ -21,6 +21,7 @@ const Toolbar = ({
   loadTemplate,
   toggleLayersPanel,
 }) => {
+  const futureOptions = true;
   return (
     <div className="toolbar">
       <button onClick={() => addElement("rect")} title="Add Rectangle">
@@ -56,21 +57,27 @@ const Toolbar = ({
       <button onClick={() => addElement("image")} title="Add Image">
         <IoImageOutline />
       </button>
-      <button onClick={() => addElement("gif")} title="Add GIF">
-        <GiFilmStrip />
-      </button>
-      <button onClick={() => addElement("video")} title="Add Video">
-        <IoVideocamOutline />
-      </button>
+      {futureOptions && (
+        <button onClick={() => addElement("gif")} title="Add GIF">
+          <GiFilmStrip />
+        </button>
+      )}
+      {futureOptions && (
+        <button onClick={() => addElement("video")} title="Add Video">
+          <IoVideocamOutline />
+        </button>
+      )}
       <button onClick={exportCanvas} title="Download PNG">
         <MdFileDownload />
       </button>
       <button onClick={saveTemplate} title="Save Template">
         <IoSaveOutline />
       </button>
-      <button onClick={loadTemplate} title="Load Template">
-        <FaRegFolder />
-      </button>
+      {futureOptions && (
+        <button onClick={loadTemplate} title="Load Template">
+          <FaRegFolder />
+        </button>
+      )}
       <button onClick={toggleLayersPanel} title="Toggle Layers Panel">
         <IoLayersOutline />
       </button>

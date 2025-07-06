@@ -7,12 +7,11 @@ import LayersPanel from "./LayersPanel";
 import ContextMenu from "./ContextMenu";
 import "./KonvaBuilder.css";
 
-function KonvaBuilder() {
-  const existingTemplate = localStorage.getItem("template");
-  const initialElements = existingTemplate ? JSON.parse(existingTemplate) : [];
+function KonvaBuilder(props) {
+  const { elements: initialElements = [], handleSave, mode = "view" } = props;
   const [elements, setElements] = useState(initialElements);
   const [selectedElement, setSelectedElement] = useState(null);
-  const [showLayersPanel, setShowLayersPanel] = useState(true);
+  const [showLayersPanel, setShowLayersPanel] = useState(mode === "edit");
   const [canvasBackgroundColor, setCanvasBackgroundColor] = useState("#ffffff");
   const [currentTool, setCurrentTool] = useState(null);
   const stageRef = useRef();
@@ -455,9 +454,7 @@ function KonvaBuilder() {
   };
 
   const saveTemplate = () => {
-    const template = JSON.stringify(elements);
-    localStorage.setItem("template", template);
-    alert("template JSON stored in localstorage");
+    handleSave(elements);
   };
 
   const loadTemplate = () => {
@@ -478,14 +475,16 @@ function KonvaBuilder() {
   return (
     <div className="App">
       <div className="main-container">
-        <Toolbar
-          addElement={addElement}
-          exportCanvas={exportCanvas}
-          saveTemplate={saveTemplate}
-          loadTemplate={loadTemplate}
-          toggleLayersPanel={toggleLayersPanel}
-        />
-        {showLayersPanel && (
+        {mode === "edit" && (
+          <Toolbar
+            addElement={addElement}
+            exportCanvas={exportCanvas}
+            saveTemplate={saveTemplate}
+            loadTemplate={loadTemplate}
+            toggleLayersPanel={toggleLayersPanel}
+          />
+        )}
+        {mode === "edit" && showLayersPanel && (
           <LayersPanel
             elements={elements}
             selectedElement={selectedElement}
@@ -508,12 +507,14 @@ function KonvaBuilder() {
           onAddPoint={onAddPoint}
           onRemovePoint={onRemovePoint}
         />
-        <PropertiesPanel
-          selectedElement={selectedElement}
-          updateElement={updateElement}
-          canvasBackgroundColor={canvasBackgroundColor}
-          setCanvasBackgroundColor={setCanvasBackgroundColor}
-        />
+        {mode === "edit" && (
+          <PropertiesPanel
+            selectedElement={selectedElement}
+            updateElement={updateElement}
+            canvasBackgroundColor={canvasBackgroundColor}
+            setCanvasBackgroundColor={setCanvasBackgroundColor}
+          />
+        )}
       </div>
       {contextMenu && (
         <ContextMenu
