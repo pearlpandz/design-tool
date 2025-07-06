@@ -41,7 +41,7 @@ function App() {
         fill: "#333333",
         stroke: "#000000",
         strokeWidth: 2,
-        isClosed: true,
+        isClosed: false,
       };
       setCurrentTool("pen");
     } else if (type === "text") {
