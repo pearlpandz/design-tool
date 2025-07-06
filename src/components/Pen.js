@@ -69,8 +69,6 @@ export default function Pen({
   };
 
   const handleClick = (e) => {
-    console.log("Pen.js: Line onClick - currentTool:", currentTool);
-    console.log("Pen.js: Line onClick - onAddPoint:", onAddPoint);
     if (e.evt.button === 0) {
       if (currentTool === "pen") {
         const pointerPosition = e.target.getStage().getPointerPosition();
@@ -82,8 +80,6 @@ export default function Pen({
   };
 
   const handleTap = (e) => {
-    console.log("Pen.js: Line onTap - currentTool:", currentTool);
-    console.log("Pen.js: Line onTap - onAddPoint:", onAddPoint);
     if (e.evt.button === 0) {
       if (currentTool === "pen") {
         const pointerPosition = e.target.getStage().getPointerPosition();

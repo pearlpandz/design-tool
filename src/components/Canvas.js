@@ -437,8 +437,6 @@ const Canvas = ({
   onAddPoint,
 }) => {
   const handleStageClick = (e) => {
-    console.log("Canvas: handleStageClick - currentTool:", currentTool);
-    console.log("Canvas: handleStageClick - selectedElement:", selectedElement);
     if (
       e.target.name() === "canvas-background" ||
       e.target.nodeType === "Stage"

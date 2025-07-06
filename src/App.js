@@ -317,8 +317,6 @@ function App() {
   };
 
   const handleSelectElement = (element, event) => {
-    console.log("handleSelectElement: element", element);
-    console.log("handleSelectElement: currentTool", currentTool);
     if (!element) {
       setSelectedElement(null);
       setSelectedElementsForClipping([]);
@@ -346,19 +344,21 @@ function App() {
   };
 
   const onAddPoint = (pointerPosition) => {
-    console.log("onAddPoint called. pointerPosition:", pointerPosition);
-    console.log("onAddPoint: selectedElement:", selectedElement);
     if (selectedElement && selectedElement.type === "pen") {
-      console.log("onAddPoint: selectedElement is pen. Adding point.");
       const newPoints = [
         ...selectedElement.points,
         pointerPosition.x,
         pointerPosition.y,
       ];
       updateElement(selectedElement.id, { points: newPoints });
-      console.log("onAddPoint: newPoints:", newPoints);
     } else {
-      console.log("onAddPoint: selectedElement is NOT pen or is null.");
+      // If not in pen mode, just select the element
+      setSelectedElement((prev) => {
+        if (prev && prev.id === selectedElement.id) {
+          return prev; // Already selected
+        }
+        return selectedElement; // Select the current element
+      });
     }
   };
 
