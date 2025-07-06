@@ -196,6 +196,16 @@ const PropertiesPanel = ({
               style={inputStyle}
             />
           </div>
+          <div style={rowStyle}>
+            <span style={labelStyle}>ROTATION</span>
+            <input
+              type="number"
+              name="rotation"
+              value={selectedElement.rotation || 0}
+              onChange={handleChange}
+              style={inputStyle}
+            />
+          </div>
 
           {/* APPEARANCE SECTION */}
           <div style={sectionTitleStyle}>APPEARANCE</div>

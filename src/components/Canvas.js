@@ -247,6 +247,7 @@ const ElementRenderer = ({
       y: node.y(),
       width: Math.max(5, (element.width || node.width()) * scaleX),
       height: Math.max(5, (element.height || node.height()) * scaleY),
+      rotation: node.rotation(),
     };
 
     if (element.type === "ellipse") {
