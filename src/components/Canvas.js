@@ -160,6 +160,7 @@ const ElementRenderer = ({
   onChange,
   onContextMenu,
   currentTool,
+  onRemovePoint,
 }) => {
   const handlePointDrag = (newPoints) => {
     onChange(element.id, { points: newPoints });
@@ -414,6 +415,7 @@ const ElementRenderer = ({
           opacity: element.opacity,
           onPointDrag: handlePointDrag,
           isSelected: isSelected,
+          onRemovePoint: onRemovePoint,
         }}
         onSelect={onSelect}
         onContextMenu={onContextMenu}
@@ -441,6 +443,7 @@ const Canvas = ({
   canvasBackgroundColor,
   currentTool,
   onAddPoint,
+  onRemovePoint,
 }) => {
   const handleStageClick = (e) => {
     if (
@@ -496,6 +499,7 @@ const Canvas = ({
             onContextMenu={onContextMenu}
             currentTool={currentTool}
             onAddPoint={onAddPoint}
+            onRemovePoint={onRemovePoint}
           />
         ))}
       </Layer>

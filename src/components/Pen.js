@@ -11,6 +11,7 @@ export default function Pen({
   isClosed,
   currentTool,
   onAddPoint,
+  onRemovePoint,
   ...rest
 }) {
   const shapeRef = useRef();
@@ -157,6 +158,11 @@ export default function Pen({
               onMouseOver={handlePointMouseOver}
               onMouseOut={handlePointMouseOut}
               onDragMove={(e) => handlePointDragMove(e, index)}
+              onClick={(e) => {
+                if (e.evt.altKey) {
+                  onRemovePoint(index);
+                }
+              }}
             />
           );
         })}

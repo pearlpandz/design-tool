@@ -362,6 +362,15 @@ function App() {
     }
   };
 
+  const onRemovePoint = (indexToRemove) => {
+    if (selectedElement && selectedElement.type === "pen") {
+      const newPoints = selectedElement.points.filter(
+        (_, index) => index / 2 !== indexToRemove
+      );
+      updateElement(selectedElement.id, { points: newPoints });
+    }
+  };
+
   const onReorderElements = (result) => {
     // eslint-disable-next-line no-unused-vars
     const { source, destination, draggableId } = result;
@@ -494,6 +503,7 @@ function App() {
           canvasBackgroundColor={canvasBackgroundColor}
           currentTool={currentTool}
           onAddPoint={onAddPoint}
+          onRemovePoint={onRemovePoint}
         />
         <PropertiesPanel
           selectedElement={selectedElement}
