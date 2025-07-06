@@ -90,8 +90,10 @@ const PropertiesPanel = ({
   updateElement,
   canvasBackgroundColor,
   setCanvasBackgroundColor,
+  mode,
 }) => {
   const handleChange = (e) => {
+    if (mode === "view") return;
     const { name, value, type } = e.target;
     if (type === "number") {
       updateElement(selectedElement.id, {
@@ -103,6 +105,7 @@ const PropertiesPanel = ({
   };
 
   const handleColorChange = (color, name) => {
+    if (mode === "view") return;
     updateElement(selectedElement.id, { [name]: color });
   };
 

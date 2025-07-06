@@ -35,7 +35,7 @@ const getLayerIcon = (type) => {
   }
 };
 
-const Layer = ({ element, index, children, updateElement, ...props }) => {
+const Layer = ({ element, index, children, updateElement, mode, ...props }) => {
   return (
     <Draggable key={element.id} draggableId={element.id} index={index}>
       {(provided, snapshot) => (
@@ -49,8 +49,8 @@ const Layer = ({ element, index, children, updateElement, ...props }) => {
           }}
         >
           <li
-            onClick={(e) => props.setSelectedElement(element, e)}
-            onContextMenu={(e) => props.onContextMenu(e, element.id)}
+            onClick={(e) => mode === "edit" && props.setSelectedElement(element, e)}
+            onContextMenu={(e) => mode === "edit" && props.onContextMenu(e, element.id)}
             className={`
               layer-item
               ${
@@ -64,17 +64,19 @@ const Layer = ({ element, index, children, updateElement, ...props }) => {
               ${snapshot.isDragging ? "dragging" : ""}
             `}
           >
-            <span className="drag-handle" {...provided.dragHandleProps}>
+            <span className="drag-handle" {...(mode === "edit" ? provided.dragHandleProps : {})}>
               <MdDragHandle />
             </span>
             {element.type === "group" && (
               <span
                 className="collapse-toggle"
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevent selecting the group when toggling
-                  updateElement(element.id, {
-                    isCollapsed: !element.isCollapsed,
-                  });
+                  if (mode === "edit") {
+                    e.stopPropagation(); // Prevent selecting the group when toggling
+                    updateElement(element.id, {
+                      isCollapsed: !element.isCollapsed,
+                    });
+                  }
                 }}
               >
                 {element.isCollapsed ? <FaCaretRight /> : <FaCaretDown />}
@@ -112,6 +114,7 @@ const LayersPanel = ({
   elements,
   onReorderElements,
   updateElement,
+  mode,
   ...props
 }) => {
   const onDragEnd = (result) => {
@@ -128,6 +131,7 @@ const LayersPanel = ({
           index={index}
           updateElement={updateElement}
           {...props}
+          mode={mode}
         >
           {children.map((child, childIndex) => (
             <Layer
@@ -135,6 +139,7 @@ const LayersPanel = ({
               element={child}
               index={childIndex}
               updateElement={updateElement}
+              mode={mode}
               {...props}
             />
           ))}

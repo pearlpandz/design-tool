@@ -21,6 +21,7 @@ function KonvaBuilder(props) {
     useState([]);
 
   const addElement = (type) => {
+    if (mode === "view") return;
     const baseProps = {
       id: uuidv4(),
       type,
@@ -167,6 +168,7 @@ function KonvaBuilder(props) {
   };
 
   const updateElement = (id, properties) => {
+    if (mode === "view") return;
     setElements(
       elements.map((el) => {
         if (el.id === id) {
@@ -204,6 +206,7 @@ function KonvaBuilder(props) {
   };
 
   const deleteElement = (idToDelete) => {
+    if (mode === "view") return;
     setElements(elements.filter((el) => el.id !== idToDelete));
     if (selectedElement && selectedElement.id === idToDelete) {
       setSelectedElement(null);
@@ -212,6 +215,7 @@ function KonvaBuilder(props) {
   };
 
   const duplicateElement = (idToDuplicate) => {
+    if (mode === "view") return;
     const elementToDuplicate = elements.find((el) => el.id === idToDuplicate);
     if (elementToDuplicate) {
       const newElement = {
@@ -227,6 +231,7 @@ function KonvaBuilder(props) {
   };
 
   const applyClippingMask = () => {
+    if (mode === "view") return;
     if (selectedElementsForClipping.length !== 2) return;
 
     const [id1, id2] = selectedElementsForClipping;
@@ -280,6 +285,7 @@ function KonvaBuilder(props) {
   };
 
   const releaseClippingMask = (elementId) => {
+    if (mode === "view") return;
     const element = elements.find((el) => el.id === elementId);
     if (!element || !element.groupId) return;
 
@@ -319,6 +325,8 @@ function KonvaBuilder(props) {
   };
 
   const handleSelectElement = (element, event) => {
+    if (mode === "view") return;
+
     if (!element) {
       setSelectedElement(null);
       setSelectedElementsForClipping([]);
@@ -346,6 +354,7 @@ function KonvaBuilder(props) {
   };
 
   const onAddPoint = (pointerPosition) => {
+    if (mode === "view") return;
     if (selectedElement && selectedElement.type === "pen") {
       const newPoints = [
         ...selectedElement.points,
@@ -365,6 +374,7 @@ function KonvaBuilder(props) {
   };
 
   const onRemovePoint = (indexToRemove) => {
+    if (mode === "view") return;
     if (selectedElement && selectedElement.type === "pen") {
       const newPoints = selectedElement.points.filter(
         (_, index) => index / 2 !== indexToRemove
@@ -374,6 +384,7 @@ function KonvaBuilder(props) {
   };
 
   const onReorderElements = (result) => {
+    if (mode === "view") return;
     // eslint-disable-next-line no-unused-vars
     const { source, destination, draggableId } = result;
 
@@ -482,6 +493,7 @@ function KonvaBuilder(props) {
             saveTemplate={saveTemplate}
             loadTemplate={loadTemplate}
             toggleLayersPanel={toggleLayersPanel}
+            mode={mode}
           />
         )}
         {mode === "edit" && showLayersPanel && (
@@ -493,6 +505,7 @@ function KonvaBuilder(props) {
             selectedElementsForClipping={selectedElementsForClipping}
             onReorderElements={onReorderElements}
             updateElement={updateElement}
+            mode={mode}
           />
         )}
         <Canvas
@@ -506,6 +519,7 @@ function KonvaBuilder(props) {
           currentTool={currentTool}
           onAddPoint={onAddPoint}
           onRemovePoint={onRemovePoint}
+          mode={mode}
         />
         {mode === "edit" && (
           <PropertiesPanel
@@ -513,6 +527,7 @@ function KonvaBuilder(props) {
             updateElement={updateElement}
             canvasBackgroundColor={canvasBackgroundColor}
             setCanvasBackgroundColor={setCanvasBackgroundColor}
+            mode={mode}
           />
         )}
       </div>
@@ -532,6 +547,7 @@ function KonvaBuilder(props) {
             !!elements.find((el) => el.id === contextMenu.elementId)?.groupId
           }
           onClose={() => setContextMenu(null)}
+          mode={mode}
         />
       )}
     </div>

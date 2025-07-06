@@ -15,7 +15,7 @@ function App() {
     <KonvaBuilder
       elements={initialElements}
       handleSave={handleSave}
-      // mode="edit"
+      mode="edit"
     />
   );
 }

@@ -18,7 +18,7 @@ import Ellipse from "./Ellipse";
 import Pen from "./Pen";
 
 const GeneralShape = forwardRef((props, ref) => {
-  const { shapeProps, onSelect, onContextMenu, onPointDrag } = props;
+  const { shapeProps, onSelect, onContextMenu, onPointDrag, mode } = props;
   let KonvaShape;
   switch (shapeProps.type) {
     case "rect":
@@ -81,20 +81,28 @@ const GeneralShape = forwardRef((props, ref) => {
         ? { activatePoints: true, onPointDrag: onPointDrag }
         : {})}
       onClick={(e) => {
-        onSelect(shapeProps, e);
-        e.cancelBubble = true;
+        if (mode === "edit") {
+          onSelect(shapeProps, e);
+          e.cancelBubble = true;
+        }
       }}
       onTap={(e) => {
-        onSelect(shapeProps, e);
-        e.cancelBubble = true;
+        if (mode === "edit") {
+          onSelect(shapeProps, e);
+          e.cancelBubble = true;
+        }
       }}
-      onContextMenu={(e) => onContextMenu(e, shapeProps.id)}
+      onContextMenu={(e) => {
+        if (mode === "edit") {
+          onContextMenu(e, shapeProps.id);
+        }
+      }}
     />
   );
 });
 
 const ImageBasedShape = forwardRef((props, ref) => {
-  const { shapeProps, onSelect, onContextMenu } = props;
+  const { shapeProps, onSelect, onContextMenu, mode } = props;
   const [image] = useImage(shapeProps.src, "anonymous");
   const videoRef = useRef(null);
 
@@ -121,26 +129,34 @@ const ImageBasedShape = forwardRef((props, ref) => {
       {...shapeProps}
       image={shapeProps.type === "video" ? videoRef.current : image}
       onClick={(e) => {
-        onSelect(shapeProps, e);
-        e.cancelBubble = true;
+        if (mode === "edit") {
+          onSelect(shapeProps, e);
+          e.cancelBubble = true;
+        }
       }}
       onTap={(e) => {
-        onSelect(shapeProps, e);
-        e.cancelBubble = true;
+        if (mode === "edit") {
+          onSelect(shapeProps, e);
+          e.cancelBubble = true;
+        }
       }}
-      onContextMenu={(e) => onContextMenu(e, shapeProps.id)}
+      onContextMenu={(e) => {
+        if (mode === "edit") {
+          onContextMenu(e, shapeProps.id);
+        }
+      }}
     />
   );
 });
 
 const Shape = forwardRef((props, ref) => {
-  const { shapeProps, onPointDrag, isSelected } = props;
+  const { shapeProps, onPointDrag, isSelected, mode } = props;
   if (
     shapeProps.type === "image" ||
     shapeProps.type === "gif" ||
     shapeProps.type === "video"
   ) {
-    return <ImageBasedShape ref={ref} {...props} />;
+    return <ImageBasedShape ref={ref} {...props} mode={mode} />;
   }
   return (
     <GeneralShape
@@ -161,6 +177,7 @@ const ElementRenderer = ({
   onContextMenu,
   currentTool,
   onRemovePoint,
+  mode,
 }) => {
   const handlePointDrag = (newPoints) => {
     onChange(element.id, { points: newPoints });
@@ -170,92 +187,98 @@ const ElementRenderer = ({
   const maskRef = useRef();
 
   useEffect(() => {
-    if (
-      element.type === "group" &&
-      isSelected &&
-      trRef.current &&
-      maskRef.current
-    ) {
-      trRef.current.nodes([maskRef.current]);
-      trRef.current.getLayer().batchDraw();
-    } else if (isSelected && trRef.current && shapeRef.current) {
-      trRef.current.nodes([shapeRef.current]);
-      trRef.current.getLayer().batchDraw();
+    if (mode === "edit") {
+      if (
+        element.type === "group" &&
+        isSelected &&
+        trRef.current &&
+        maskRef.current
+      ) {
+        trRef.current.nodes([maskRef.current]);
+        trRef.current.getLayer().batchDraw();
+      } else if (isSelected && trRef.current && shapeRef.current) {
+        trRef.current.nodes([shapeRef.current]);
+        trRef.current.getLayer().batchDraw();
+      }
     }
   }, [isSelected, element.type]);
 
   const handleDragEnd = (e) => {
-    onChange(element.id, { x: e.target.x(), y: e.target.y() });
+    if (mode === "edit") {
+      onChange(element.id, { x: e.target.x(), y: e.target.y() });
+    }
   };
 
   const handleTransformEnd = () => {
-    if (element.type === "group") {
+    if (mode === "edit") {
+      if (element.type === "group") {
+        const node = shapeRef.current;
+        if (!node) return;
+        const scaleX = node.scaleX();
+        const scaleY = node.scaleY();
+
+        node.scaleX(1);
+        node.scaleY(1);
+
+        const groupChildren = elements.filter((el) => el.groupId === element.id);
+        groupChildren.forEach((child) => {
+          let updated = { ...child };
+
+          updated.x = (child.x - element.x) * scaleX + element.x;
+          updated.y = (child.y - element.y) * scaleY + element.y;
+
+          if (child.width) updated.width = child.width * scaleX;
+          if (child.height) updated.height = child.height * scaleY;
+          if (child.radius)
+            updated.radius = child.radius * Math.max(scaleX, scaleY);
+          if (child.radiusX) updated.radiusX = child.radiusX * scaleX;
+          if (child.radiusY) updated.radiusY = child.radiusY * scaleY;
+          if (child.points) {
+            updated.points = child.points.map((val, idx) =>
+              idx % 2 === 0
+                ? (val - element.x) * scaleX + element.x
+                : (val - element.y) * scaleY + element.y
+            );
+          }
+
+          onChange(child.id, updated);
+        });
+
+        // Update group position after scale
+        onChange(element.id, {
+          x: node.x(),
+          y: node.y(),
+          width: element.width * scaleX,
+          height: element.height * scaleY,
+          _version: Date.now(),
+        });
+
+        return;
+      }
+
+      // default case for single shape
       const node = shapeRef.current;
       if (!node) return;
       const scaleX = node.scaleX();
       const scaleY = node.scaleY();
-
       node.scaleX(1);
       node.scaleY(1);
 
-      const groupChildren = elements.filter((el) => el.groupId === element.id);
-      groupChildren.forEach((child) => {
-        let updated = { ...child };
-
-        updated.x = (child.x - element.x) * scaleX + element.x;
-        updated.y = (child.y - element.y) * scaleY + element.y;
-
-        if (child.width) updated.width = child.width * scaleX;
-        if (child.height) updated.height = child.height * scaleY;
-        if (child.radius)
-          updated.radius = child.radius * Math.max(scaleX, scaleY);
-        if (child.radiusX) updated.radiusX = child.radiusX * scaleX;
-        if (child.radiusY) updated.radiusY = child.radiusY * scaleY;
-        if (child.points) {
-          updated.points = child.points.map((val, idx) =>
-            idx % 2 === 0
-              ? (val - element.x) * scaleX + element.x
-              : (val - element.y) * scaleY + element.y
-          );
-        }
-
-        onChange(child.id, updated);
-      });
-
-      // Update group position after scale
-      onChange(element.id, {
+      const updatedProps = {
         x: node.x(),
         y: node.y(),
-        width: element.width * scaleX,
-        height: element.height * scaleY,
-        _version: Date.now(),
-      });
+        width: Math.max(5, (element.width || node.width()) * scaleX),
+        height: Math.max(5, (element.height || node.height()) * scaleY),
+        rotation: node.rotation(),
+      };
 
-      return;
+      if (element.type === "ellipse") {
+        updatedProps.radiusX = updatedProps.width / 2;
+        updatedProps.radiusY = updatedProps.height / 2;
+      }
+
+      onChange(element.id, updatedProps);
     }
-
-    // default case for single shape
-    const node = shapeRef.current;
-    if (!node) return;
-    const scaleX = node.scaleX();
-    const scaleY = node.scaleY();
-    node.scaleX(1);
-    node.scaleY(1);
-
-    const updatedProps = {
-      x: node.x(),
-      y: node.y(),
-      width: Math.max(5, (element.width || node.width()) * scaleX),
-      height: Math.max(5, (element.height || node.height()) * scaleY),
-      rotation: node.rotation(),
-    };
-
-    if (element.type === "ellipse") {
-      updatedProps.radiusX = updatedProps.width / 2;
-      updatedProps.radiusY = updatedProps.height / 2;
-    }
-
-    onChange(element.id, updatedProps);
   };
 
   if (element.type === "group") {
@@ -366,7 +389,7 @@ const ElementRenderer = ({
         <Group
           ref={shapeRef}
           {...element}
-          draggable={isSelected}
+          draggable={mode === "edit" && isSelected}
           onDragEnd={handleDragEnd}
           onTransformEnd={handleTransformEnd}
           onClick={(e) => {
@@ -387,10 +410,11 @@ const ElementRenderer = ({
               shapeProps={child}
               onSelect={() => onSelect(element)}
               onContextMenu={onContextMenu}
+              mode={mode}
             />
           ))}
         </Group>
-        {isSelected && (
+        {mode === "edit" && isSelected && (
           <Transformer
             ref={trRef}
             boundBoxFunc={(oldBox, newBox) => {
@@ -410,7 +434,7 @@ const ElementRenderer = ({
         ref={shapeRef}
         shapeProps={{
           ...element,
-          draggable: isSelected,
+          draggable: mode === "edit" && isSelected,
           onDragEnd: handleDragEnd,
           onTransformEnd: handleTransformEnd,
           opacity: element.opacity,
@@ -420,8 +444,9 @@ const ElementRenderer = ({
         }}
         onSelect={onSelect}
         onContextMenu={onContextMenu}
+        mode={mode}
       />
-      {isSelected && (
+      {mode === "edit" && isSelected && (
         <Transformer
           ref={trRef}
           boundBoxFunc={(oldBox, newBox) => {
@@ -445,17 +470,20 @@ const Canvas = ({
   currentTool,
   onAddPoint,
   onRemovePoint,
+  mode,
 }) => {
   const handleStageClick = (e) => {
-    if (
-      e.target.name() === "canvas-background" ||
-      e.target.nodeType === "Stage"
-    ) {
-      if (currentTool === "pen") {
-        const pointerPosition = e.target.getStage().getPointerPosition();
-        onAddPoint(pointerPosition);
-      } else {
-        setSelectedElement(null);
+    if (mode === "edit") {
+      if (
+        e.target.name() === "canvas-background" ||
+        e.target.nodeType === "Stage"
+      ) {
+        if (currentTool === "pen") {
+          const pointerPosition = e.target.getStage().getPointerPosition();
+          onAddPoint(pointerPosition);
+        } else {
+          setSelectedElement(null);
+        }
       }
     }
   };
@@ -501,6 +529,7 @@ const Canvas = ({
             currentTool={currentTool}
             onAddPoint={onAddPoint}
             onRemovePoint={onRemovePoint}
+            mode={mode}
           />
         ))}
       </Layer>

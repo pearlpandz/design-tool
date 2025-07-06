@@ -20,67 +20,96 @@ const Toolbar = ({
   saveTemplate,
   loadTemplate,
   toggleLayersPanel,
+  mode,
 }) => {
   const futureOptions = true;
   return (
     <div className="toolbar">
-      <button onClick={() => addElement("rect")} title="Add Rectangle">
-        <LuRectangleHorizontal />
-      </button>
-      <button onClick={() => addElement("square")} title="Add Square">
-        <FaRegSquare />
-      </button>
-      <button onClick={() => addElement("circle")} title="Add Circle">
-        <FaRegCircle />
-      </button>
-      <button onClick={() => addElement("line")} title="Add Line">
-        <FiMinus />
-      </button>
-      <button onClick={() => addElement("pen")} title="Add Pen">
-        <FaPen />
-      </button>
-      <button onClick={() => addElement("polygon")} title="Add Polygon">
-        <LiaDrawPolygonSolid />
-      </button>
-      <button onClick={() => addElement("star")} title="Add Star">
-        <FaRegStar />
-      </button>
-      <button onClick={() => addElement("arc")} title="Add Arc">
-        <TbCircleDashed />
-      </button>
-      <button onClick={() => addElement("ellipse")} title="Add Ellipse">
-        <TbOvalVertical />
-      </button>
-      <button onClick={() => addElement("text")} title="Add Text">
-        <IoTextOutline />
-      </button>
-      <button onClick={() => addElement("image")} title="Add Image">
-        <IoImageOutline />
-      </button>
-      {futureOptions && (
+      {mode === "edit" && (
+        <button onClick={() => addElement("rect")} title="Add Rectangle">
+          <LuRectangleHorizontal />
+        </button>
+      )}
+      {mode === "edit" && (
+        <button onClick={() => addElement("square")} title="Add Square">
+          <FaRegSquare />
+        </button>
+      )}
+      {mode === "edit" && (
+        <button onClick={() => addElement("circle")} title="Add Circle">
+          <FaRegCircle />
+        </button>
+      )}
+      {mode === "edit" && (
+        <button onClick={() => addElement("line")} title="Add Line">
+          <FiMinus />
+        </button>
+      )}
+      {mode === "edit" && (
+        <button onClick={() => addElement("pen")} title="Add Pen">
+          <FaPen />
+        </button>
+      )}
+      {mode === "edit" && (
+        <button onClick={() => addElement("polygon")} title="Add Polygon">
+          <LiaDrawPolygonSolid />
+        </button>
+      )}
+      {mode === "edit" && (
+        <button onClick={() => addElement("star")} title="Add Star">
+          <FaRegStar />
+        </button>
+      )}
+      {mode === "edit" && (
+        <button onClick={() => addElement("arc")} title="Add Arc">
+          <TbCircleDashed />
+        </button>
+      )}
+      {mode === "edit" && (
+        <button onClick={() => addElement("ellipse")} title="Add Ellipse">
+          <TbOvalVertical />
+        </button>
+      )}
+      {mode === "edit" && (
+        <button onClick={() => addElement("text")} title="Add Text">
+          <IoTextOutline />
+        </button>
+      )}
+      {mode === "edit" && (
+        <button onClick={() => addElement("image")} title="Add Image">
+          <IoImageOutline />
+        </button>
+      )}
+      {futureOptions && mode === "edit" && (
         <button onClick={() => addElement("gif")} title="Add GIF">
           <GiFilmStrip />
         </button>
       )}
-      {futureOptions && (
+      {futureOptions && mode === "edit" && (
         <button onClick={() => addElement("video")} title="Add Video">
           <IoVideocamOutline />
         </button>
       )}
-      <button onClick={exportCanvas} title="Download PNG">
-        <MdFileDownload />
-      </button>
-      <button onClick={saveTemplate} title="Save Template">
-        <IoSaveOutline />
-      </button>
-      {futureOptions && (
+      {mode === "edit" && (
+        <button onClick={exportCanvas} title="Download PNG">
+          <MdFileDownload />
+        </button>
+      )}
+      {mode === "edit" && (
+        <button onClick={saveTemplate} title="Save Template">
+          <IoSaveOutline />
+        </button>
+      )}
+      {futureOptions && mode === "edit" && (
         <button onClick={loadTemplate} title="Load Template">
           <FaRegFolder />
         </button>
       )}
-      <button onClick={toggleLayersPanel} title="Toggle Layers Panel">
-        <IoLayersOutline />
-      </button>
+      {mode === "edit" && (
+        <button onClick={toggleLayersPanel} title="Toggle Layers Panel">
+          <IoLayersOutline />
+        </button>
+      )}
     </div>
   );
 };
